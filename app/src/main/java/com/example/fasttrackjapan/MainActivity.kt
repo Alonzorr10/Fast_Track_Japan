@@ -28,7 +28,12 @@ import com.example.fasttrackjapan.ui.theme.FastTrackJapanTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.LaunchedEffect
+import io.github.jan.supabase.auth.auth
+import android.util.Log
 
+
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,12 +41,57 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FastTrackJapanTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    WelcomeScreen(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                val viewModel: BillViewModel = viewModel()
+
+                // Test Connection
+                LaunchedEffect(Unit) {
+                    try {
+                        val session = Supabase.client.auth.currentSessionOrNull()
+                        Log.d("SupabaseTest", "Connection Success! Session: $session")
+                    } catch (e: Exception) {
+                        Log.e("SupabaseTest", "Connection Failed: ${e.message}", e)
+                    }
+                }
+
+                NavHost(navController = navController, startDestination = "welcome") {
+                    composable("welcome") {
+                        WelcomeScreen(
+                            onLogin = { navController.navigate("main_menu") },
+                            onSignUp = { navController.navigate("main_menu") },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    composable("main_menu") {
+                        MainMenuScreen(
+                            onBillTrackerClick = { navController.navigate("bills_menu") }
+                        )
+                    }
+                    composable("bills_menu") {
+                        BillsMenuScreen(
+                            onScreenshotClick = { navController.navigate("camera") },
+                            onViewLibraryClick = { navController.navigate("library") },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("camera") {
+                        CameraCaptureFlow(
+                            onBillCaptured = { label, date, uri ->
+                                viewModel.addBill(label, date, uri)
+                                navController.popBackStack("bills_menu", false)
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("library") {
+                        BillLibraryScreen(
+                            bills = viewModel.bills,
+                            onBack = { navController.popBackStack() },
+                            onEditBill = { /* Handle edit */ },
+                            onSortByLabel = { viewModel.sortBillsByLabel() },
+                            onSortByDate = { viewModel.sortBillsByDate() }
+                        )
+                    }
                 }
             }
         }
@@ -49,9 +99,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun WelcomeScreen(modifier: Modifier = Modifier) {
+fun WelcomeScreen(
+    onLogin: () -> Unit,
+    onSignUp: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -65,9 +121,8 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Log In Button (Filled Style)
         Button(
-            onClick = { },
+            onClick = onLogin,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Log In", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
@@ -76,7 +131,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedButton(
-            onClick = { /* TODO: Handle Sign Up Navigation */ },
+            onClick = onSignUp,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Sign Up", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
@@ -88,6 +143,6 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
 @Composable
 fun WelcomeScreenPreview() {
     FastTrackJapanTheme {
-        WelcomeScreen()
+        WelcomeScreen(onLogin = {}, onSignUp = {})
     }
 }
