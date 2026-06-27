@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
             FastTrackJapanTheme {
                 val navController = rememberNavController()
                 val viewModel: BillViewModel = viewModel()
+                val docViewModel: DocumentViewModel = viewModel()
 
                 // Session persistence check
                 LaunchedEffect(Unit) {
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
                         if (session != null) {
                             Log.d("SupabaseTest", "Session found, navigating to main_menu")
                             viewModel.fetchBills()
+                            docViewModel.fetchDocuments()
                             navController.navigate("main_menu") {
                                 popUpTo("welcome") { inclusive = true }
                             }
@@ -73,6 +75,7 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(
                             onLoginSuccess = { 
                                 viewModel.fetchBills() // Refresh bills after login
+                                docViewModel.fetchDocuments()
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -84,6 +87,7 @@ class MainActivity : ComponentActivity() {
                         SignUpScreen(
                             onSignUpSuccess = { 
                                 viewModel.fetchBills() // Refresh bills after signup
+                                docViewModel.fetchDocuments()
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -95,11 +99,13 @@ class MainActivity : ComponentActivity() {
                         val scope = androidx.compose.runtime.rememberCoroutineScope()
                         MainMenuScreen(
                             onBillTrackerClick = { navController.navigate("bills_menu") },
+                            onExpirationTrackerClick = { navController.navigate("expiration_list") },
                             onSignOutClick = {
                                 scope.launch {
                                     try {
                                         Supabase.client.auth.signOut()
                                         viewModel.clearBills()
+                                        docViewModel.clearDocuments()
                                         navController.navigate("welcome") {
                                             popUpTo("main_menu") { inclusive = true }
                                         }
@@ -109,6 +115,44 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         )
+                    }
+                    composable("expiration_list") {
+                        ExpirationTrackerScreen(
+                            documents = docViewModel.documents,
+                            onBack = { navController.popBackStack() },
+                            onAddClick = { navController.navigate("add_document") },
+                            onEditClick = { doc ->
+                                navController.navigate("edit_document/${doc.id}")
+                            },
+                            onDeleteClick = { docViewModel.deleteDocument(it) }
+                        )
+                    }
+                    composable("add_document") {
+                        AddEditDocumentScreen(
+                            onSave = { type, date, lead ->
+                                docViewModel.addDocument(type, date, lead)
+                                navController.popBackStack()
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("edit_document/{docId}") { backStackEntry ->
+                        val docId = backStackEntry.arguments?.getString("docId")
+                        val doc = docViewModel.documents.find { it.id == docId }
+                        if (doc != null) {
+                            AddEditDocumentScreen(
+                                existingDoc = doc,
+                                onSave = { type, date, lead ->
+                                    docViewModel.updateDocument(doc.copy(
+                                        type = type,
+                                        expirationDate = date,
+                                        notificationLeadTime = lead
+                                    ))
+                                    navController.popBackStack()
+                                },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                     composable("bills_menu") {
                         BillsMenuScreen(
