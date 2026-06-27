@@ -20,17 +20,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,10 +56,13 @@ fun BillLibraryScreen(
     bills: List<Bill>,
     onBack: () -> Unit,
     onEditBill: (Bill) -> Unit,
+    onDeleteBill: (Bill) -> Unit,
     onSortByLabel: () -> Unit,
     onSortByDate: () -> Unit
 ) {
     var showSortMenu by remember { mutableStateOf(false) }
+    var selectedBillForView by remember { mutableStateOf<Bill?>(null) }
+    val sheetState = rememberModalBottomSheetState()
 
     Scaffold(
         topBar = {
@@ -104,8 +112,48 @@ fun BillLibraryScreen(
                 modifier = Modifier.padding(innerPadding)
             ) {
                 items(bills) { bill ->
-                    BillCard(bill = bill, onEdit = { onEditBill(bill) })
+                    BillCard(
+                        bill = bill, 
+                        onEdit = { onEditBill(bill) },
+                        onDelete = { onDeleteBill(bill) },
+                        onView = { selectedBillForView = bill }
+                    )
                 }
+            }
+        }
+    }
+
+    if (selectedBillForView != null) {
+        ModalBottomSheet(
+            onDismissRequest = { selectedBillForView = null },
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = selectedBillForView!!.label,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = selectedBillForView!!.date,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                AsyncImage(
+                    model = selectedBillForView!!.imageUrl,
+                    contentDescription = selectedBillForView!!.label,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Fit
+                )
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -114,7 +162,9 @@ fun BillLibraryScreen(
 @Composable
 fun BillCard(
     bill: Bill,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onView: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -126,13 +176,13 @@ fun BillCard(
         Column {
             Box {
                 AsyncImage(
-                    model = bill.imageUri,
+                    model = bill.imageUrl,
                     contentDescription = bill.label,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
                         .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                        .clickable { onEdit() },
+                        .clickable { onView() },
                     contentScale = ContentScale.Crop
                 )
                 
@@ -152,8 +202,19 @@ fun BillCard(
                     onDismissRequest = { showMenu = false }
                 ) {
                     DropdownMenuItem(
+                        text = { Text("View") },
+                        leadingIcon = { Icon(Icons.Default.Visibility, contentDescription = null) },
+                        onClick = { onView(); showMenu = false }
+                    )
+                    DropdownMenuItem(
                         text = { Text("Edit") },
                         onClick = { onEdit(); showMenu = false }
+                    )
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text("Delete") },
+                        leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                        onClick = { onDelete(); showMenu = false }
                     )
                 }
             }

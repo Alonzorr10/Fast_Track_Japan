@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.LaunchedEffect
 import io.github.jan.supabase.auth.auth
 import android.util.Log
+import kotlinx.coroutines.launch
 
 
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,27 +45,69 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val viewModel: BillViewModel = viewModel()
 
-                // Test Connection
+                // Session persistence check
                 LaunchedEffect(Unit) {
                     try {
                         val session = Supabase.client.auth.currentSessionOrNull()
-                        Log.d("SupabaseTest", "Connection Success! Session: $session")
+                        if (session != null) {
+                            Log.d("SupabaseTest", "Session found, navigating to main_menu")
+                            viewModel.fetchBills()
+                            navController.navigate("main_menu") {
+                                popUpTo("welcome") { inclusive = true }
+                            }
+                        }
                     } catch (e: Exception) {
-                        Log.e("SupabaseTest", "Connection Failed: ${e.message}", e)
+                        Log.e("SupabaseTest", "Session check failed: ${e.message}")
                     }
                 }
 
                 NavHost(navController = navController, startDestination = "welcome") {
                     composable("welcome") {
                         WelcomeScreen(
-                            onLogin = { navController.navigate("main_menu") },
-                            onSignUp = { navController.navigate("main_menu") },
+                            onLogin = { navController.navigate("login") },
+                            onSignUp = { navController.navigate("signup") },
                             modifier = Modifier.fillMaxSize()
                         )
                     }
+                    composable("login") {
+                        LoginScreen(
+                            onLoginSuccess = { 
+                                viewModel.fetchBills() // Refresh bills after login
+                                navController.navigate("main_menu") {
+                                    popUpTo("welcome") { inclusive = true }
+                                }
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("signup") {
+                        SignUpScreen(
+                            onSignUpSuccess = { 
+                                viewModel.fetchBills() // Refresh bills after signup
+                                navController.navigate("main_menu") {
+                                    popUpTo("welcome") { inclusive = true }
+                                }
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
                     composable("main_menu") {
+                        val scope = androidx.compose.runtime.rememberCoroutineScope()
                         MainMenuScreen(
-                            onBillTrackerClick = { navController.navigate("bills_menu") }
+                            onBillTrackerClick = { navController.navigate("bills_menu") },
+                            onSignOutClick = {
+                                scope.launch {
+                                    try {
+                                        Supabase.client.auth.signOut()
+                                        viewModel.clearBills()
+                                        navController.navigate("welcome") {
+                                            popUpTo("main_menu") { inclusive = true }
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("MainActivity", "Sign out failed", e)
+                                    }
+                                }
+                            }
                         )
                     }
                     composable("bills_menu") {
@@ -75,9 +118,10 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("camera") {
+                        val context = androidx.compose.ui.platform.LocalContext.current
                         CameraCaptureFlow(
                             onBillCaptured = { label, date, uri ->
-                                viewModel.addBill(label, date, uri)
+                                viewModel.addBill(context, label, date, uri)
                                 navController.popBackStack("bills_menu", false)
                             },
                             onBack = { navController.popBackStack() }
@@ -88,6 +132,7 @@ class MainActivity : ComponentActivity() {
                             bills = viewModel.bills,
                             onBack = { navController.popBackStack() },
                             onEditBill = { /* Handle edit */ },
+                            onDeleteBill = { viewModel.deleteBill(it) },
                             onSortByLabel = { viewModel.sortBillsByLabel() },
                             onSortByDate = { viewModel.sortBillsByDate() }
                         )
