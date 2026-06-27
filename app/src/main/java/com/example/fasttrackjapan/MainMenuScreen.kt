@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
@@ -39,6 +40,7 @@ import com.example.fasttrackjapan.ui.theme.FastTrackJapanTheme
 @Composable
 fun MainMenuScreen(
     onBillTrackerClick: () -> Unit,
+    onExpirationTrackerClick: () -> Unit,
     onSignOutClick: () -> Unit
 ) {
     Scaffold(
@@ -72,9 +74,18 @@ fun MainMenuScreen(
                     onClick = onBillTrackerClick
                 )
             }
+
+            item {
+                MainMenuCard(
+                    title = "Expiration Tracker",
+                    subtitle = "Track document expiration dates",
+                    icon = Icons.Default.Badge,
+                    onClick = onExpirationTrackerClick
+                )
+            }
             
             // Placeholders for future components
-            items(4) { index ->
+            items(3) { index ->
                 MainMenuCard(
                     title = "Component ${index + 2}",
                     subtitle = "Coming soon",
@@ -143,6 +154,6 @@ fun MainMenuCard(
 @Preview(showBackground = true)
 fun MainMenuScreenPreview(){
     FastTrackJapanTheme() {
-        MainMenuScreen(onBillTrackerClick = {}, onSignOutClick = {})
+        MainMenuScreen(onBillTrackerClick = {}, onExpirationTrackerClick = {}, onSignOutClick = {})
     }
 }
