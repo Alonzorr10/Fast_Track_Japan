@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Lock
@@ -41,6 +42,7 @@ import com.example.fasttrackjapan.ui.theme.FastTrackJapanTheme
 fun MainMenuScreen(
     onBillTrackerClick: () -> Unit,
     onExpirationTrackerClick: () -> Unit,
+    onProfileClick: () -> Unit,
     onSignOutClick: () -> Unit
 ) {
     Scaffold(
@@ -48,6 +50,12 @@ fun MainMenuScreen(
             TopAppBar(
                 title = { Text("Fast Track Japan") },
                 actions = {
+                    IconButton(onClick = onProfileClick) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Profile"
+                        )
+                    }
                     IconButton(onClick = onSignOutClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
@@ -154,6 +162,6 @@ fun MainMenuCard(
 @Preview(showBackground = true)
 fun MainMenuScreenPreview(){
     FastTrackJapanTheme() {
-        MainMenuScreen(onBillTrackerClick = {}, onExpirationTrackerClick = {}, onSignOutClick = {})
+        MainMenuScreen(onBillTrackerClick = {}, onExpirationTrackerClick = {}, onProfileClick = {}, onSignOutClick = {})
     }
 }

@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val viewModel: BillViewModel = viewModel()
                 val docViewModel: DocumentViewModel = viewModel()
+                val profileViewModel: ProfileViewModel = viewModel()
 
                 // Session persistence check
                 LaunchedEffect(Unit) {
@@ -54,6 +55,7 @@ class MainActivity : ComponentActivity() {
                             Log.d("SupabaseTest", "Session found, navigating to main_menu")
                             viewModel.fetchBills()
                             docViewModel.fetchDocuments()
+                            profileViewModel.fetchProfile()
                             navController.navigate("main_menu") {
                                 popUpTo("welcome") { inclusive = true }
                             }
@@ -76,6 +78,7 @@ class MainActivity : ComponentActivity() {
                             onLoginSuccess = { 
                                 viewModel.fetchBills() // Refresh bills after login
                                 docViewModel.fetchDocuments()
+                                profileViewModel.fetchProfile()
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -88,6 +91,7 @@ class MainActivity : ComponentActivity() {
                             onSignUpSuccess = { 
                                 viewModel.fetchBills() // Refresh bills after signup
                                 docViewModel.fetchDocuments()
+                                profileViewModel.fetchProfile()
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -100,6 +104,7 @@ class MainActivity : ComponentActivity() {
                         MainMenuScreen(
                             onBillTrackerClick = { navController.navigate("bills_menu") },
                             onExpirationTrackerClick = { navController.navigate("expiration_list") },
+                            onProfileClick = { navController.navigate("profile") },
                             onSignOutClick = {
                                 scope.launch {
                                     try {
@@ -114,6 +119,12 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
+                        )
+                    }
+                    composable("profile") {
+                        ProfileScreen(
+                            viewModel = profileViewModel,
+                            onBack = { navController.popBackStack() }
                         )
                     }
                     composable("expiration_list") {
