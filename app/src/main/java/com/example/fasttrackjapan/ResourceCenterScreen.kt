@@ -50,12 +50,12 @@ fun ResourceCenterScreen(
         ResourceLink(
             "My Number Card Application",
             "Official PDF guide and application form for the My Number Card system.",
-            "https://www.kojinbango-card.go.jp/en-kofu-yuso/"
+            "https://net.kojinbango-card.go.jp/SS_SERVICE_OUT/FA01S001Action.do"
         ),
         ResourceLink(
             "National Pension Exemption",
             "Information and forms for applying for National Pension premium exemptions.",
-            "https://www.nenkin.go.jp/international/english/nationalpension/nationalpension.html#cms04"
+            "https://www.nenkin.go.jp/service/pamphlet/kaigai/kokunenmenjyo_ta.html"
         ),
         ResourceLink(
             "Driver's License Exchange",
@@ -70,7 +70,7 @@ fun ResourceCenterScreen(
         ResourceLink(
             "Move-out/Move-in Notification",
             "General information on the procedures for moving between different wards or cities.",
-            "https://www.soumu.go.jp/main_sosiki/jichi_gyousei/c-gyousei/zairyu/english/move_index.html"
+            "https://www.u-tokyo.ac.jp/adm/inbound/en/life-housing-moving.html"
         ),
         ResourceLink(
             title = "Residence Card Renewal",
