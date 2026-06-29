@@ -47,24 +47,6 @@ class MainActivity : ComponentActivity() {
                 val docViewModel: DocumentViewModel = viewModel()
                 val profileViewModel: ProfileViewModel = viewModel()
 
-                // Session persistence check
-                LaunchedEffect(Unit) {
-                    try {
-                        val session = Supabase.client.auth.currentSessionOrNull()
-                        if (session != null) {
-                            Log.d("SupabaseTest", "Session found, navigating to main_menu")
-                            viewModel.fetchBills()
-                            docViewModel.fetchDocuments()
-                            profileViewModel.fetchProfile()
-                            navController.navigate("main_menu") {
-                                popUpTo("welcome") { inclusive = true }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.e("SupabaseTest", "Session check failed: ${e.message}")
-                    }
-                }
-
                 NavHost(navController = navController, startDestination = "welcome") {
                     composable("welcome") {
                         WelcomeScreen(
@@ -182,11 +164,28 @@ class MainActivity : ComponentActivity() {
                             onBack = { navController.popBackStack() }
                         )
                     }
+
+                    composable(route = "edit_bill/{billId}") { backStackEntry ->
+                        val billId = backStackEntry.arguments?.getString("billId")
+                        val bill = viewModel.bills.find { it.id == billId }
+                        if (bill != null) {
+                            EditBillScreen(
+                                bill = bill,
+                                onSave = { label, date ->
+                                    viewModel.updateBill(bill.copy(label = label, date = date))
+                                    navController.popBackStack()
+                                },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
                     composable("library") {
                         BillLibraryScreen(
                             bills = viewModel.bills,
                             onBack = { navController.popBackStack() },
-                            onEditBill = { /* Handle edit */ },
+                            onEditBill = { bill ->
+                                navController.navigate("edit_bill/${bill.id}")
+                            },
                             onDeleteBill = { viewModel.deleteBill(it) },
                             onSortByLabel = { viewModel.sortBillsByLabel() },
                             onSortByDate = { viewModel.sortBillsByDate() }
