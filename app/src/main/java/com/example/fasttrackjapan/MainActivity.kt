@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.LaunchedEffect
 import io.github.jan.supabase.auth.auth
 import android.util.Log
+import androidx.compose.ui.text.font.FontStyle
 import kotlinx.coroutines.launch
 
 
@@ -216,6 +217,14 @@ fun WelcomeScreen(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
+        )
+        Text(
+            text = "Convenience at your 指先",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Center,
+            fontStyle = FontStyle.Italic
         )
 
         Spacer(modifier = Modifier.height(48.dp))
