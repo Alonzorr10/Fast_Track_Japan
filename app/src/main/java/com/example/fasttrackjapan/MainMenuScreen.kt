@@ -17,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +43,7 @@ import com.example.fasttrackjapan.ui.theme.FastTrackJapanTheme
 fun MainMenuScreen(
     onBillTrackerClick: () -> Unit,
     onExpirationTrackerClick: () -> Unit,
+    onResourceCenterClick: () -> Unit,
     onProfileClick: () -> Unit,
     onSignOutClick: () -> Unit
 ) {
@@ -91,11 +93,20 @@ fun MainMenuScreen(
                     onClick = onExpirationTrackerClick
                 )
             }
+
+            item {
+                MainMenuCard(
+                    title = "Resource Center",
+                    subtitle = "Official forms and procedure guides",
+                    icon = Icons.Default.Info,
+                    onClick = onResourceCenterClick
+                )
+            }
             
             // Placeholders for future components
-            items(3) { index ->
+            items(2) { index ->
                 MainMenuCard(
-                    title = "Component ${index + 2}",
+                    title = "Component ${index + 4}",
                     subtitle = "Coming soon",
                     icon = Icons.Default.Lock,
                     enabled = false,
@@ -162,6 +173,12 @@ fun MainMenuCard(
 @Preview(showBackground = true)
 fun MainMenuScreenPreview(){
     FastTrackJapanTheme() {
-        MainMenuScreen(onBillTrackerClick = {}, onExpirationTrackerClick = {}, onProfileClick = {}, onSignOutClick = {})
+        MainMenuScreen(
+            onBillTrackerClick = {}, 
+            onExpirationTrackerClick = {}, 
+            onResourceCenterClick = {},
+            onProfileClick = {}, 
+            onSignOutClick = {}
+        )
     }
 }

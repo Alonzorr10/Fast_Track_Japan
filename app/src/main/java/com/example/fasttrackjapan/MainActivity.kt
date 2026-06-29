@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
                         MainMenuScreen(
                             onBillTrackerClick = { navController.navigate("bills_menu") },
                             onExpirationTrackerClick = { navController.navigate("expiration_list") },
+                            onResourceCenterClick = { navController.navigate("resource_center") },
                             onProfileClick = { navController.navigate("profile") },
                             onSignOutClick = {
                                 scope.launch {
@@ -178,6 +179,11 @@ class MainActivity : ComponentActivity() {
                                 onBack = { navController.popBackStack() }
                             )
                         }
+                    }
+                    composable("resource_center") {
+                        ResourceCenterScreen(
+                            onBack = { navController.popBackStack() }
+                        )
                     }
                     composable("library") {
                         BillLibraryScreen(
