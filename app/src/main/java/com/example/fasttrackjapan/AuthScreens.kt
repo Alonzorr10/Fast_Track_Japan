@@ -58,7 +58,7 @@ fun LoginScreen(
         )
 
         if (errorMessage != null) {
-            Text("The Email or Password you inputted was incorrect. Please fill in the correct details", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
+            Text(errorMessage!!, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -75,7 +75,16 @@ fun LoginScreen(
                         }
                         onLoginSuccess()
                     } catch (e: Exception) {
-                        errorMessage = e.message ?: "Login failed"
+                        Log.e("Login", "Error: ${e.message}")
+                        errorMessage = when {
+                            e.message?.contains("credential", ignoreCase = true) == true ||
+                            e.message?.contains("invalid", ignoreCase = true) == true ->
+                                "The email or password you entered is incorrect."
+                            e.message?.contains("network", ignoreCase = true) == true ||
+                            e.message?.contains("connect", ignoreCase = true) == true ->
+                                "Connection error. Please check your internet and try again."
+                            else -> "Login failed. Please try again."
+                        }
                     } finally {
                         isLoading = false
                     }
@@ -222,10 +231,12 @@ fun SignUpScreen(
                                 updatedAt = java.time.Instant.now().toString()
                             )
                             Log.d("SignUp", "Creating profile for user ${user.id}: $profile")
-                            Supabase.client.postgrest["profiles"].insert(profile)
+                            Supabase.client.postgrest["profiles"].upsert(profile)
                             onSignUpSuccess()
                         } else {
-                            errorMessage = "This email has already been registered. Please log in instead or sign up with another email."
+                            // No active session after sign-up means email confirmation is required
+                            // by the project settings; the profile is created after the user confirms and logs in.
+                            errorMessage = "Account created. Please check your email to confirm your address, then log in."
                         }
                     } catch (e: Exception) {
                         Log.e("SignUp", "Error: ${e.message}")
