@@ -84,6 +84,14 @@ fun DocumentCard(
         else -> Icons.Default.Badge
     }
 
+    val isExpired = remember(doc.expirationDate) {
+        try {
+            LocalDate.parse(doc.expirationDate).isBefore(LocalDate.now())
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -100,7 +108,11 @@ fun DocumentCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(doc.type, style = MaterialTheme.typography.titleMedium)
                 Text("Expires: ${doc.expirationDate}", style = MaterialTheme.typography.bodyMedium)
-                Text("Alert: ${doc.notificationLeadTime} days before", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+                if (isExpired) {
+                    Text("EXPIRED", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error)
+                } else {
+                    Text("Alert: ${doc.notificationLeadTime} days before", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.secondary)
+                }
             }
             IconButton(onClick = { onDelete(doc) }) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
@@ -151,7 +163,9 @@ fun AddEditDocumentScreen(
                     onValueChange = {},
                     readOnly = true,
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                    modifier = Modifier
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                        .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -169,10 +183,10 @@ fun AddEditDocumentScreen(
                 }
             }
 
-            OutlinedTextField(
+            DateField(
                 value = expirationDate,
                 onValueChange = { expirationDate = it },
-                label = { Text("Expiration Date (YYYY-MM-DD)") },
+                label = "Expiration Date",
                 modifier = Modifier.fillMaxWidth()
             )
 

@@ -30,7 +30,9 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val profile = viewModel.profile
-    
+
+    LaunchedEffect(Unit) { viewModel.fetchProfile() }
+
     var fullName by remember(profile) { mutableStateOf(profile?.fullName ?: "") }
     var age by remember(profile) { mutableStateOf(profile?.age?.toString() ?: "") }
     var address by remember(profile) { mutableStateOf(profile?.address ?: "") }
