@@ -345,15 +345,15 @@ fun LabelBillScreen(
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        TextField(
+        DateField(
             value = date,
             onValueChange = { date = it },
-            label = { Text("Date (YYYY-MM-DD)") },
+            label = "Date",
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(32.dp))
-        
+
         Button(
             onClick = { if (label.isNotBlank()) onSave(label, date) },
             modifier = Modifier.fillMaxWidth(),

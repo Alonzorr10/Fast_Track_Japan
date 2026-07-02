@@ -12,6 +12,7 @@ import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class BillViewModel : ViewModel() {
     private val _bills = mutableStateListOf<Bill>()
@@ -150,14 +151,31 @@ class BillViewModel : ViewModel() {
                         eq("id", bill.id)
                     }
                 }
-                
-                // Optionally delete from Storage (requires parsing filename from URL)
-                
+
+                // Delete the associated image from Storage so we don't leave orphaned files.
+                storagePathFromPublicUrl(bill.imageUrl)?.let { path ->
+                    try {
+                        Supabase.client.storage["Bills"].delete(path)
+                    } catch (e: Exception) {
+                        Log.e("BillViewModel", "Failed to delete bill image: ${e.message}")
+                    }
+                }
+
                 _bills.removeIf { it.id == bill.id }
             } catch (e: Exception) {
                 Log.e("BillViewModel", "Error deleting bill: ${e.message}")
             }
         }
+    }
+
+    /**
+     * Extracts the in-bucket object path from a Supabase public storage URL.
+     * e.g. ".../object/public/Bills/<userId>/<file>.jpg" -> "<userId>/<file>.jpg"
+     */
+    private fun storagePathFromPublicUrl(url: String): String? {
+        val marker = "/object/public/Bills/"
+        val idx = url.indexOf(marker)
+        return if (idx == -1) null else url.substring(idx + marker.length).substringBefore('?')
     }
 
     fun updateBill(updatedBill: Bill) {
@@ -179,14 +197,21 @@ class BillViewModel : ViewModel() {
     }
 
     fun sortBillsByLabel() {
-        val sorted = _bills.sortedBy { it.label }
+        val sorted = _bills.sortedBy { it.label.lowercase() }
         _bills.clear()
         _bills.addAll(sorted)
     }
 
     fun sortBillsByDate() {
-        val sorted = _bills.sortedBy { it.date }
+        // Sort chronologically by parsed date; unparseable dates sort last.
+        val sorted = _bills.sortedBy { parseDateOrNull(it.date) ?: LocalDate.MAX }
         _bills.clear()
         _bills.addAll(sorted)
+    }
+
+    private fun parseDateOrNull(value: String): LocalDate? = try {
+        LocalDate.parse(value)
+    } catch (e: Exception) {
+        null
     }
 }

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class DocumentViewModel : ViewModel() {
     private val _documents = mutableStateListOf<ExpirationDocument>()
@@ -22,9 +21,6 @@ class DocumentViewModel : ViewModel() {
             try {
                 val user = Supabase.client.auth.currentUserOrNull()
                 if (user != null) {
-                    // First, cleanup expired documents from DB
-                    cleanupExpiredDocuments()
-                    
                     val docsFromDb = Supabase.client.postgrest["documents"]
                         .select {
                             filter {
@@ -39,19 +35,6 @@ class DocumentViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("DocumentViewModel", "Error fetching documents: ${e.message}")
             }
-        }
-    }
-
-    private suspend fun cleanupExpiredDocuments() {
-        try {
-            val today = LocalDate.now().toString()
-            Supabase.client.postgrest["documents"].delete {
-                filter {
-                    lt("expirationDate", today)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("DocumentViewModel", "Error cleaning up expired docs: ${e.message}")
         }
     }
 

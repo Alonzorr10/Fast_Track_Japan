@@ -80,10 +80,10 @@ fun EditBillScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            TextField(
+            DateField(
                 value = date,
                 onValueChange = { date = it },
-                label = { Text("Date (YYYY-MM-DD)") },
+                label = "Date",
                 modifier = Modifier.fillMaxWidth()
             )
             
