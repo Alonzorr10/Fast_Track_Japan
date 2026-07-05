@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
@@ -44,6 +45,7 @@ fun MainMenuScreen(
     onBillTrackerClick: () -> Unit,
     onExpirationTrackerClick: () -> Unit,
     onResourceCenterClick: () -> Unit,
+    onGarbageScheduleClick: () -> Unit,
     onProfileClick: () -> Unit,
     onSignOutClick: () -> Unit
 ) {
@@ -103,10 +105,19 @@ fun MainMenuScreen(
                 )
             }
             
-            // Placeholders for future components
-            items(2) { index ->
+            item {
                 MainMenuCard(
-                    title = "Component ${index + 4}",
+                    title = "Garbage Schedule",
+                    subtitle = "Collection days & reminders for your ward",
+                    icon = Icons.Default.Delete,
+                    onClick = onGarbageScheduleClick
+                )
+            }
+
+            // Placeholder for the remaining future component
+            item {
+                MainMenuCard(
+                    title = "Component 5",
                     subtitle = "Coming soon",
                     icon = Icons.Default.Lock,
                     enabled = false,
@@ -174,10 +185,11 @@ fun MainMenuCard(
 fun MainMenuScreenPreview(){
     FastTrackJapanTheme() {
         MainMenuScreen(
-            onBillTrackerClick = {}, 
-            onExpirationTrackerClick = {}, 
+            onBillTrackerClick = {},
+            onExpirationTrackerClick = {},
             onResourceCenterClick = {},
-            onProfileClick = {}, 
+            onGarbageScheduleClick = {},
+            onProfileClick = {},
             onSignOutClick = {}
         )
     }
