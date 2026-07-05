@@ -1,6 +1,7 @@
 package com.example.fasttrackjapan
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,7 +12,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,6 +24,14 @@ fun GarbageSetupScreen(
     onBack: () -> Unit
 ) {
     LaunchedEffect(Unit) { viewModel.loadWards() }
+
+    val context = LocalContext.current
+    var hasNotifPermission by remember {
+        mutableStateOf(
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        )
+    }
 
     var selectedWard by remember { mutableStateOf<GarbageWard?>(null) }
     var selectedArea by remember { mutableStateOf<GarbageArea?>(null) }
@@ -33,7 +44,7 @@ fun GarbageSetupScreen(
 
     val notifPermission = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = { }
+        onResult = { granted -> hasNotifPermission = granted }
     )
 
     Scaffold(
@@ -142,12 +153,28 @@ fun GarbageSetupScreen(
                 }
             }
 
+            if (reminderEnabled && !hasNotifPermission) {
+                Text(
+                    "Notifications are turned off for this app. Reminders won't appear until you enable them in system settings.",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
             Spacer(Modifier.weight(1f))
+
+            viewModel.errorMessage?.let {
+                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
 
             Button(
                 onClick = {
-                    selectedArea?.let { area ->
-                        viewModel.saveSetup(area.id, reminderEnabled, reminderTime, onDone = onSaved)
+                    if (reminderEnabled && !hasNotifPermission) {
+                        notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        selectedArea?.let { area ->
+                            viewModel.saveSetup(area.id, reminderEnabled, reminderTime, onDone = onSaved)
+                        }
                     }
                 },
                 enabled = selectedArea != null && !viewModel.isLoading,

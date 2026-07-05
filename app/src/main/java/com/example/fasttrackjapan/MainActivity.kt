@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -99,6 +100,7 @@ class MainActivity : ComponentActivity() {
                                         Supabase.client.auth.signOut()
                                         viewModel.clearBills()
                                         docViewModel.clearDocuments()
+                                        garbageViewModel.clear()
                                         navController.navigate("welcome") {
                                             popUpTo("main_menu") { inclusive = true }
                                         }
@@ -191,7 +193,13 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("garbage") {
-                        if (garbageViewModel.hasArea) {
+                        if (!garbageViewModel.initialLoadDone) {
+                            LaunchedEffect(Unit) { garbageViewModel.load() }
+                            androidx.compose.foundation.layout.Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = androidx.compose.ui.Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        } else if (garbageViewModel.hasArea) {
                             GarbageScheduleScreen(
                                 viewModel = garbageViewModel,
                                 onBack = { navController.popBackStack() },
