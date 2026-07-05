@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
                 val viewModel: BillViewModel = viewModel()
                 val docViewModel: DocumentViewModel = viewModel()
                 val profileViewModel: ProfileViewModel = viewModel()
+                val garbageViewModel: GarbageViewModel = viewModel()
 
                 NavHost(navController = navController, startDestination = "welcome") {
                     composable("welcome") {
@@ -58,10 +59,11 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("login") {
                         LoginScreen(
-                            onLoginSuccess = { 
+                            onLoginSuccess = {
                                 viewModel.fetchBills() // Refresh bills after login
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
+                                garbageViewModel.load()
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -71,10 +73,11 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("signup") {
                         SignUpScreen(
-                            onSignUpSuccess = { 
+                            onSignUpSuccess = {
                                 viewModel.fetchBills() // Refresh bills after signup
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
+                                garbageViewModel.load()
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -88,6 +91,7 @@ class MainActivity : ComponentActivity() {
                             onBillTrackerClick = { navController.navigate("bills_menu") },
                             onExpirationTrackerClick = { navController.navigate("expiration_list") },
                             onResourceCenterClick = { navController.navigate("resource_center") },
+                            onGarbageScheduleClick = { navController.navigate("garbage") },
                             onProfileClick = { navController.navigate("profile") },
                             onSignOutClick = {
                                 scope.launch {
@@ -183,6 +187,32 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("resource_center") {
                         ResourceCenterScreen(
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("garbage") {
+                        if (garbageViewModel.hasArea) {
+                            GarbageScheduleScreen(
+                                viewModel = garbageViewModel,
+                                onBack = { navController.popBackStack() },
+                                onChangeArea = { navController.navigate("garbage_setup") }
+                            )
+                        } else {
+                            GarbageSetupScreen(
+                                viewModel = garbageViewModel,
+                                onSaved = {
+                                    navController.navigate("garbage") {
+                                        popUpTo("garbage") { inclusive = true }
+                                    }
+                                },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable("garbage_setup") {
+                        GarbageSetupScreen(
+                            viewModel = garbageViewModel,
+                            onSaved = { navController.popBackStack() },
                             onBack = { navController.popBackStack() }
                         )
                     }
