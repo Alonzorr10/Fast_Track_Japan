@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +58,7 @@ fun GarbageScheduleScreen(
         ) {
             item {
                 Text(
-                    "${snapshot.area.nameJa}",
+                    snapshot.area.nameJa,
                     style = MaterialTheme.typography.titleLarge
                 )
             }

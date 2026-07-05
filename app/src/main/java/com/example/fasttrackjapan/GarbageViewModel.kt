@@ -22,6 +22,10 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var isLoading by mutableStateOf(false)
         private set
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+    var initialLoadDone by mutableStateOf(false)
+        private set
 
     val wards = mutableStateListOf<GarbageWard>()
     val areas = mutableStateListOf<GarbageArea>()
@@ -44,6 +48,7 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
         snapshot = repo.readCache()
         viewModelScope.launch {
             isLoading = true
+            errorMessage = null
             try {
                 val s = repo.getUserSettings()
                 settings = s
@@ -54,8 +59,10 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
                 }
             } catch (e: Exception) {
                 Log.e("GarbageViewModel", "load failed: ${e.message}")
+                errorMessage = "Couldn't load your schedule. Check your connection."
             } finally {
                 isLoading = false
+                initialLoadDone = true
             }
         }
     }
@@ -86,6 +93,7 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
     fun saveSetup(areaId: String, reminderEnabled: Boolean, reminderTime: String, onDone: () -> Unit) {
         viewModelScope.launch {
             isLoading = true
+            errorMessage = null
             try {
                 val user = Supabase.client.auth.currentUserOrNull()
                 if (user == null) {
@@ -115,9 +123,23 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
                 onDone()
             } catch (e: Exception) {
                 Log.e("GarbageViewModel", "saveSetup failed: ${e.message}")
+                errorMessage = "Couldn't save. Check your connection and try again."
             } finally {
                 isLoading = false
             }
         }
+    }
+
+    /** Reset all garbage state on sign-out so nothing leaks to the next user. */
+    fun clear() {
+        settings = null
+        snapshot = null
+        wards.clear()
+        areas.clear()
+        errorMessage = null
+        initialLoadDone = false
+        val ctx = getApplication<Application>().applicationContext
+        GarbageReminderScheduler.cancel(ctx)
+        viewModelScope.launch { repo.clearCache() }
     }
 }
