@@ -82,4 +82,9 @@ dependencies {
     implementation(libs.supabase.storage)
 
     implementation(libs.ktor.client.android)
+
+    // WorkManager (garbage reminders)
+    implementation(libs.androidx.work.runtime.ktx)
+    // Explicit JSON runtime for the local schedule cache
+    implementation(libs.kotlinx.serialization.json)
 }
