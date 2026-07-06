@@ -49,8 +49,33 @@ class MainActivity : ComponentActivity() {
                 val docViewModel: DocumentViewModel = viewModel()
                 val profileViewModel: ProfileViewModel = viewModel()
                 val garbageViewModel: GarbageViewModel = viewModel()
+                val appContext = androidx.compose.ui.platform.LocalContext.current
 
-                NavHost(navController = navController, startDestination = "welcome") {
+                NavHost(navController = navController, startDestination = "splash") {
+                    composable("splash") {
+                        // Auto-login: wait for the persisted session to load, then route.
+                        LaunchedEffect(Unit) {
+                            Supabase.client.auth.awaitInitialization()
+                            if (Supabase.client.auth.currentUserOrNull() != null) {
+                                viewModel.fetchBills()
+                                docViewModel.fetchDocuments()
+                                profileViewModel.fetchProfile()
+                                garbageViewModel.load()
+                                DocumentReminderScheduler.schedule(appContext)
+                                navController.navigate("main_menu") {
+                                    popUpTo("splash") { inclusive = true }
+                                }
+                            } else {
+                                navController.navigate("welcome") {
+                                    popUpTo("splash") { inclusive = true }
+                                }
+                            }
+                        }
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = androidx.compose.ui.Alignment.Center
+                        ) { CircularProgressIndicator() }
+                    }
                     composable("welcome") {
                         WelcomeScreen(
                             onLogin = { navController.navigate("login") },
@@ -65,6 +90,7 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                DocumentReminderScheduler.schedule(appContext)
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -79,6 +105,7 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                DocumentReminderScheduler.schedule(appContext)
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -101,6 +128,7 @@ class MainActivity : ComponentActivity() {
                                         viewModel.clearBills()
                                         docViewModel.clearDocuments()
                                         garbageViewModel.clear()
+                                        DocumentReminderScheduler.cancel(appContext)
                                         navController.navigate("welcome") {
                                             popUpTo("main_menu") { inclusive = true }
                                         }
@@ -132,6 +160,7 @@ class MainActivity : ComponentActivity() {
                         AddEditDocumentScreen(
                             onSave = { type, date, lead ->
                                 docViewModel.addDocument(type, date, lead)
+                                DocumentReminderScheduler.schedule(appContext)
                                 navController.popBackStack()
                             },
                             onBack = { navController.popBackStack() }
