@@ -50,7 +50,30 @@ class MainActivity : ComponentActivity() {
                 val profileViewModel: ProfileViewModel = viewModel()
                 val garbageViewModel: GarbageViewModel = viewModel()
 
-                NavHost(navController = navController, startDestination = "welcome") {
+                NavHost(navController = navController, startDestination = "splash") {
+                    composable("splash") {
+                        // Auto-login: wait for the persisted session to load, then route.
+                        LaunchedEffect(Unit) {
+                            Supabase.client.auth.awaitInitialization()
+                            if (Supabase.client.auth.currentUserOrNull() != null) {
+                                viewModel.fetchBills()
+                                docViewModel.fetchDocuments()
+                                profileViewModel.fetchProfile()
+                                garbageViewModel.load()
+                                navController.navigate("main_menu") {
+                                    popUpTo("splash") { inclusive = true }
+                                }
+                            } else {
+                                navController.navigate("welcome") {
+                                    popUpTo("splash") { inclusive = true }
+                                }
+                            }
+                        }
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = androidx.compose.ui.Alignment.Center
+                        ) { CircularProgressIndicator() }
+                    }
                     composable("welcome") {
                         WelcomeScreen(
                             onLogin = { navController.navigate("login") },
