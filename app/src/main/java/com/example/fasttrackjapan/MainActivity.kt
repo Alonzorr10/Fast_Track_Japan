@@ -79,11 +79,28 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
-                                navController.navigate("main_menu") {
+                                // Capture garbage-collection location as a one-time step right after registration.
+                                navController.navigate("location_onboarding") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
                             },
                             onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("location_onboarding") {
+                        GarbageSetupScreen(
+                            viewModel = garbageViewModel,
+                            onSaved = {
+                                navController.navigate("main_menu") {
+                                    popUpTo("location_onboarding") { inclusive = true }
+                                }
+                            },
+                            // Allow skipping; they can set it later from the Garbage card.
+                            onBack = {
+                                navController.navigate("main_menu") {
+                                    popUpTo("location_onboarding") { inclusive = true }
+                                }
+                            }
                         )
                     }
                     composable("main_menu") {
