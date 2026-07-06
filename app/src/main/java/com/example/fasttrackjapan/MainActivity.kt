@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
                 val docViewModel: DocumentViewModel = viewModel()
                 val profileViewModel: ProfileViewModel = viewModel()
                 val garbageViewModel: GarbageViewModel = viewModel()
+                val appContext = androidx.compose.ui.platform.LocalContext.current
 
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") {
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                DocumentReminderScheduler.schedule(appContext)
                                 navController.navigate("main_menu") {
                                     popUpTo("splash") { inclusive = true }
                                 }
@@ -88,6 +90,7 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                DocumentReminderScheduler.schedule(appContext)
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -102,6 +105,7 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                DocumentReminderScheduler.schedule(appContext)
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -124,6 +128,7 @@ class MainActivity : ComponentActivity() {
                                         viewModel.clearBills()
                                         docViewModel.clearDocuments()
                                         garbageViewModel.clear()
+                                        DocumentReminderScheduler.cancel(appContext)
                                         navController.navigate("welcome") {
                                             popUpTo("main_menu") { inclusive = true }
                                         }
@@ -155,6 +160,7 @@ class MainActivity : ComponentActivity() {
                         AddEditDocumentScreen(
                             onSave = { type, date, lead ->
                                 docViewModel.addDocument(type, date, lead)
+                                DocumentReminderScheduler.schedule(appContext)
                                 navController.popBackStack()
                             },
                             onBack = { navController.popBackStack() }
