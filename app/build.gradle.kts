@@ -7,13 +7,13 @@ plugins {
 android {
     namespace = "com.example.fasttrackjapan"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
 
     defaultConfig {
         applicationId = "com.example.fasttrackjapan"
-        minSdk = 37
-        targetSdk = 37
+        minSdk = 26
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
