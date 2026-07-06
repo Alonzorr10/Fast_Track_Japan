@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local-only planning/design docs (not for the shared repo)
+/docs/superpowers/
