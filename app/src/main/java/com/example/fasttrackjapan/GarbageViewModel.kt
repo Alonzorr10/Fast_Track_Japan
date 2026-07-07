@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -30,10 +31,8 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
     val wards = mutableStateListOf<GarbageWard>()
     val areas = mutableStateListOf<GarbageArea>()
 
-    /** Non-empty once the user has completed setup. */
     val hasArea: Boolean get() = settings?.areaId != null
 
-    /** Upcoming collections for the next 14 days, from the cached/loaded snapshot. */
     val upcoming: List<UpcomingCollection>
         get() = snapshot?.let {
             GarbageScheduleCalculator.upcoming(LocalDate.now(), 14, it.schedules)
@@ -42,9 +41,7 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
     fun categoryLabel(code: String): String =
         snapshot?.categories?.firstOrNull { it.code == code }?.let { "${it.nameJa} (${it.nameEn})" } ?: code
 
-    /** Called when the screen opens: load settings + cached snapshot, refresh from network. */
     fun load() {
-        // Show cache immediately for offline/instant render.
         snapshot = repo.readCache()
         viewModelScope.launch {
             isLoading = true
@@ -89,8 +86,7 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Persist setup, cache the schedule, and (re)schedule reminders. onDone runs on success. */
-    fun saveSetup(areaId: String, reminderEnabled: Boolean, reminderTime: String, onDone: () -> Unit) {
+    fun saveSetup(areaId: String, wardName: String, reminderEnabled: Boolean, reminderTime: String, onDone: () -> Unit) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
@@ -107,8 +103,24 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
                     reminderTime = reminderTime,
                     updatedAt = java.time.Instant.now().toString()
                 )
+                
+                // 1. Save specific garbage settings
                 repo.saveUserSettings(newSettings)
                 settings = newSettings
+
+                // 2. Sync ward name to user profile for consistency
+                try {
+                    Supabase.client.postgrest["profiles"].update(
+                        mapOf("ward" to wardName)
+                    ) {
+                        filter {
+                            eq("id", user.id)
+                        }
+                    }
+                    Log.d("GarbageViewModel", "Updated user profile ward to: $wardName")
+                } catch (e: Exception) {
+                    Log.e("GarbageViewModel", "Failed to sync ward to profile: ${e.message}")
+                }
 
                 val fresh = repo.fetchSnapshot(areaId)
                 snapshot = fresh

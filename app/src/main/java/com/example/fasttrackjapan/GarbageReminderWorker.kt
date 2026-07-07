@@ -27,7 +27,6 @@ class GarbageReminderWorker(
                 }
             }
         } finally {
-            // Always reschedule the next day's check.
             GarbageReminderScheduler.schedule(context, reminderTime)
         }
         return Result.success()
@@ -45,8 +44,8 @@ class GarbageReminderWorker(
 
         val notification = NotificationCompat.Builder(context, GarbageReminderScheduler.CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("明日のゴミ / Tomorrow's garbage")
-            .setContentText("明日は $categoryLabels の日です。今夜出しましょう。")
+            .setContentTitle("Tomorrow's garbage")
+            .setContentText("Tomorrow is $categoryLabels day. Please put it out tonight.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .build()

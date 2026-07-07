@@ -58,7 +58,7 @@ fun GarbageScheduleScreen(
         ) {
             item {
                 Text(
-                    snapshot.area.nameJa,
+                    snapshot.area.nameEn.toString(),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -78,7 +78,6 @@ fun GarbageScheduleScreen(
                 }
             }
 
-            // Oversized garbage info card (on-demand, not scheduled)
             snapshot.categories.firstOrNull { it.code == "OVERSIZED" }?.let { oversized ->
                 item {
                     Card(Modifier.fillMaxWidth()) {

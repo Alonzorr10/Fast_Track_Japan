@@ -35,8 +35,6 @@ fun ProfileScreen(
 
     var fullName by remember(profile) { mutableStateOf(profile?.fullName ?: "") }
     var age by remember(profile) { mutableStateOf(profile?.age?.toString() ?: "") }
-    var address by remember(profile) { mutableStateOf(profile?.address ?: "") }
-    var ward by remember(profile) { mutableStateOf(profile?.ward ?: "") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val imagePicker = rememberLauncherForActivityResult(
@@ -122,20 +120,37 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            OutlinedTextField(
-                value = ward,
-                onValueChange = { ward = it },
-                label = { Text("Ward (Ku)") },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("e.g. Minato, Shibuya") }
-            )
-
-            OutlinedTextField(
-                value = address,
-                onValueChange = { address = it },
-                label = { Text("Address") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (profile?.ward?.isNotBlank() == true) {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person, // Using person as a placeholder for "Home" or "Ward"
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                "Assigned Ward",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                            Text(
+                                profile.ward,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -144,8 +159,8 @@ fun ProfileScreen(
                     viewModel.saveProfile(
                         fullName = fullName,
                         age = age.toIntOrNull(),
-                        address = address,
-                        ward = ward,
+                        address = profile?.address ?: "",
+                        ward = profile?.ward ?: "",
                         profilePictureUri = selectedImageUri,
                         context = context,
                         onSuccess = { /* Handle success toast if needed */ }

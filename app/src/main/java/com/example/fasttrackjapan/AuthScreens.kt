@@ -120,8 +120,6 @@ fun SignUpScreen(
 
     var fullName by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
-    var ward by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
 
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -166,22 +164,6 @@ fun SignUpScreen(
             label = { Text("Age") },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = ward,
-            onValueChange = { ward = it },
-            label = { Text("Ward (e.g. Minato)") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = address,
-            onValueChange = { address = it },
-            label = { Text("Address") },
-            modifier = Modifier.fillMaxWidth()
-        )
 
         if (errorMessage != null) {
             Text(errorMessage!!, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
@@ -194,8 +176,8 @@ fun SignUpScreen(
                 val ageInt = age.toIntOrNull()
                 
                 // 1. Client-side Validation
-                if (fullName.isBlank() || ward.isBlank() || address.isBlank()) {
-                    errorMessage = "Please fill in all fields."
+                if (fullName.isBlank()) {
+                    errorMessage = "Please enter your full name."
                     return@Button
                 }
                 
@@ -226,8 +208,6 @@ fun SignUpScreen(
                                 email = email,
                                 fullName = fullName,
                                 age = ageInt,
-                                ward = ward,
-                                address = address,
                                 updatedAt = java.time.Instant.now().toString()
                             )
                             Log.d("SignUp", "Creating profile for user ${user.id}: $profile")

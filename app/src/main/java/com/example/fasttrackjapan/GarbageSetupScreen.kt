@@ -98,7 +98,7 @@ fun GarbageSetupScreen(
             // Area (chōme) dropdown
             ExposedDropdownMenuBox(expanded = areaExpanded, onExpandedChange = { if (selectedWard != null) areaExpanded = !areaExpanded }) {
                 OutlinedTextField(
-                    value = selectedArea?.nameJa ?: "",
+                    value = selectedArea?.nameEn ?: "",
                     onValueChange = {},
                     readOnly = true,
                     enabled = selectedWard != null,
@@ -111,7 +111,7 @@ fun GarbageSetupScreen(
                 ExposedDropdownMenu(expanded = areaExpanded, onDismissRequest = { areaExpanded = false }) {
                     viewModel.areas.forEach { area ->
                         DropdownMenuItem(
-                            text = { Text(area.nameJa) },
+                            text = { Text(area.nameEn.toString()) },
                             onClick = {
                                 selectedArea = area
                                 areaExpanded = false
@@ -133,7 +133,6 @@ fun GarbageSetupScreen(
                 })
             }
 
-            // Reminder time dropdown
             ExposedDropdownMenuBox(expanded = timeExpanded, onExpandedChange = { if (reminderEnabled) timeExpanded = !timeExpanded }) {
                 OutlinedTextField(
                     value = reminderTime,
@@ -173,7 +172,8 @@ fun GarbageSetupScreen(
                         notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                     } else {
                         selectedArea?.let { area ->
-                            viewModel.saveSetup(area.id, reminderEnabled, reminderTime, onDone = onSaved)
+                            val wardName = selectedWard?.let { "${it.nameJa} (${it.nameEn})" } ?: ""
+                            viewModel.saveSetup(area.id, wardName, reminderEnabled, reminderTime, onDone = onSaved)
                         }
                     }
                 },

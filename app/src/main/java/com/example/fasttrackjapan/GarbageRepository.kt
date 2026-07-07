@@ -13,55 +13,97 @@ class GarbageRepository(private val context: Context) {
 
     private val cacheFile: File get() = File(context.filesDir, "garbage_cache.json")
 
-    suspend fun fetchWards(): List<GarbageWard> =
-        Supabase.client.postgrest["garbage_wards"]
-            .select { order("nameEn", Order.ASCENDING) }
-            .decodeList()
+    // Hardcoded fallbacks only used if DB is empty/unreachable
+    private val fallbackWards = listOf(GarbageWard("131041", "新宿区", "Shinjuku City"))
+    private val fallbackArea = GarbageArea("shinjuku-1", "131041", "西新宿1丁目", "Nishi-Shinjuku 1-chome")
 
-    suspend fun fetchAreas(wardCode: String): List<GarbageArea> =
+    suspend fun fetchWards(): List<GarbageWard> = try {
+        val list = Supabase.client.postgrest["garbage_wards"]
+            .select { order("nameEn", Order.ASCENDING) }
+            .decodeList<GarbageWard>()
+        if (list.isEmpty()) fallbackWards else list
+    } catch (e: Exception) {
+        Log.e("GarbageRepository", "Fetch wards failed: ${e.message}")
+        fallbackWards
+    }
+
+    suspend fun fetchAreas(wardCode: String): List<GarbageArea> = try {
         Supabase.client.postgrest["garbage_areas"]
             .select {
                 filter { eq("wardCode", wardCode) }
                 order("nameJa", Order.ASCENDING)
             }
-            .decodeList()
+            .decodeList<GarbageArea>()
+    } catch (e: Exception) {
+        Log.e("GarbageRepository", "Fetch areas failed: ${e.message}")
+        emptyList()
+    }
 
-    suspend fun fetchSnapshot(areaId: String): GarbageScheduleSnapshot {
+    suspend fun fetchSnapshot(areaId: String): GarbageScheduleSnapshot = try {
+        // 1. Fetch Area
         val area = Supabase.client.postgrest["garbage_areas"]
             .select { filter { eq("id", areaId) } }
             .decodeSingle<GarbageArea>()
-        val categories = Supabase.client.postgrest["garbage_categories"]
-            .select { order("sort", Order.ASCENDING) }
-            .decodeList<GarbageCategory>()
+
+        // 2. Fetch Categories
+        val categories = try {
+            Supabase.client.postgrest["garbage_categories"]
+                .select { order("sort", Order.ASCENDING) }
+                .decodeList<GarbageCategory>()
+        } catch (e: Exception) {
+            Log.w("GarbageRepository", "Categories fetch failed, using defaults")
+            defaultCategories()
+        }
+
+        // 3. Fetch Schedules
         val schedules = Supabase.client.postgrest["garbage_schedules"]
             .select { filter { eq("areaId", areaId) } }
             .decodeList<GarbageSchedule>()
-        return GarbageScheduleSnapshot(area, categories, schedules)
+
+        GarbageScheduleSnapshot(area, categories, schedules)
+    } catch (e: Exception) {
+        Log.e("GarbageRepository", "fetchSnapshot failed: ${e.message}")
+        // If everything fails, return a minimal snapshot so the app doesn't crash
+        GarbageScheduleSnapshot(fallbackArea, defaultCategories(), emptyList())
     }
+
+    private fun defaultCategories() = listOf(
+        GarbageCategory("burnable", "可燃ごみ", "Burnable", true, 1),
+        GarbageCategory("unburnable", "不燃ごみ", "Unburnable", true, 2),
+        GarbageCategory("plastic", "プラスチック", "Plastic", true, 3),
+        GarbageCategory("recyclable", "資源ごみ", "Recyclables", true, 4)
+    )
 
     suspend fun getUserSettings(): GarbageUserSettings? {
         val user = Supabase.client.auth.currentUserOrNull() ?: return null
-        return Supabase.client.postgrest["garbage_user_settings"]
-            .select { filter { eq("userId", user.id) } }
-            .decodeSingleOrNull()
+        return try {
+            Supabase.client.postgrest["garbage_user_settings"]
+                .select { filter { eq("userId", user.id) } }
+                .decodeSingleOrNull()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     suspend fun saveUserSettings(settings: GarbageUserSettings) {
-        Supabase.client.postgrest["garbage_user_settings"].upsert(settings)
+        try {
+            Supabase.client.postgrest["garbage_user_settings"].upsert(settings)
+        } catch (e: Exception) {
+            Log.e("GarbageRepository", "Save settings failed: ${e.message}")
+        }
     }
 
     fun writeCache(snapshot: GarbageScheduleSnapshot) {
         try {
             cacheFile.writeText(GarbageCache.encode(snapshot))
         } catch (e: Exception) {
-            Log.e("GarbageRepository", "Failed to write cache: ${e.message}")
+            Log.e("GarbageRepository", "Cache write failed: ${e.message}")
         }
     }
 
     fun readCache(): GarbageScheduleSnapshot? = try {
         if (cacheFile.exists()) GarbageCache.decode(cacheFile.readText()) else null
     } catch (e: Exception) {
-        Log.e("GarbageRepository", "Failed to read cache: ${e.message}")
         null
     }
 

@@ -172,7 +172,6 @@ fun CameraPreviewScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Bill Outline Overlay
         Canvas(modifier = Modifier.fillMaxSize()) {
             val width = size.width * 0.8f
             val height = width * 0.6f // Typical bill aspect ratio

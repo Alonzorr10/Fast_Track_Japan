@@ -21,13 +21,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-/**
- * A read-only date field backed by a Material 3 date picker.
- *
- * Guarantees the emitted value is always a valid ISO date (yyyy-MM-dd), so callers
- * never have to trust hand-typed input. This is the single source of date entry
- * for the app (bills and tracked documents).
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(

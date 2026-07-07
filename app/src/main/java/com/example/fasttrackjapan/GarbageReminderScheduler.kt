@@ -28,7 +28,6 @@ object GarbageReminderScheduler {
         manager.createNotificationChannel(channel)
     }
 
-    /** (Re)schedule the daily reminder check to fire at [reminderTime] ("HH:mm"). */
     fun schedule(context: Context, reminderTime: String) {
         ensureChannel(context)
         val delayMillis = millisUntilNext(reminderTime)
