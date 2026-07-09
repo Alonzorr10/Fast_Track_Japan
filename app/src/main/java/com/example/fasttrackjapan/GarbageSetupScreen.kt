@@ -28,7 +28,6 @@ fun GarbageSetupScreen(
     val context = LocalContext.current
     var hasNotifPermission by remember {
         mutableStateOf(
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         )
     }
@@ -95,14 +94,13 @@ fun GarbageSetupScreen(
                 }
             }
 
-            // Area (chōme) dropdown
             ExposedDropdownMenuBox(expanded = areaExpanded, onExpandedChange = { if (selectedWard != null) areaExpanded = !areaExpanded }) {
                 OutlinedTextField(
                     value = selectedArea?.nameEn ?: "",
                     onValueChange = {},
                     readOnly = true,
                     enabled = selectedWard != null,
-                    label = { Text("District (丁目)") },
+                    label = { Text("District") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = areaExpanded) },
                     modifier = Modifier
                         .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
@@ -127,7 +125,7 @@ fun GarbageSetupScreen(
                 Text("Enable reminders", modifier = Modifier.weight(1f))
                 Switch(checked = reminderEnabled, onCheckedChange = {
                     reminderEnabled = it
-                    if (it && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (it) {
                         notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
                 })

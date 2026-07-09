@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserProfile(
-    val id: String, // Matches Supabase Auth UID
+    val id: String,
     val email: String,
     val fullName: String = "",
     val age: Int? = null,

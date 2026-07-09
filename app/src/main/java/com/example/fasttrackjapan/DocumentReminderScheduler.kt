@@ -12,10 +12,6 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 
-/**
- * Schedules a once-daily check that fires reminders for documents nearing expiry.
- * Reuses WorkManager (already a project dependency); reschedules itself each run.
- */
 object DocumentReminderScheduler {
     const val CHANNEL_ID = "document_reminders"
     const val WORK_NAME = "document_reminder_work"
@@ -31,7 +27,6 @@ object DocumentReminderScheduler {
         manager.createNotificationChannel(channel)
     }
 
-    /** (Re)schedule the daily check for ~09:00 local time. */
     fun schedule(context: Context) {
         ensureChannel(context)
         val request = OneTimeWorkRequestBuilder<DocumentReminderWorker>()

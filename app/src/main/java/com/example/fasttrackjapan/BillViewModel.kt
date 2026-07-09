@@ -168,10 +168,6 @@ class BillViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Extracts the in-bucket object path from a Supabase public storage URL.
-     * e.g. ".../object/public/Bills/<userId>/<file>.jpg" -> "<userId>/<file>.jpg"
-     */
     private fun storagePathFromPublicUrl(url: String): String? {
         val marker = "/object/public/Bills/"
         val idx = url.indexOf(marker)

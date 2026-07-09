@@ -104,11 +104,9 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
                     updatedAt = java.time.Instant.now().toString()
                 )
                 
-                // 1. Save specific garbage settings
                 repo.saveUserSettings(newSettings)
                 settings = newSettings
 
-                // 2. Sync ward name to user profile for consistency
                 try {
                     Supabase.client.postgrest["profiles"].update(
                         mapOf("ward" to wardName)
@@ -142,7 +140,6 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Reset all garbage state on sign-out so nothing leaks to the next user. */
     fun clear() {
         settings = null
         snapshot = null

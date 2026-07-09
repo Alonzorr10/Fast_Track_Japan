@@ -10,15 +10,12 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,17 +26,15 @@ fun ExpirationTrackerScreen(
     onEditClick: (ExpirationDocument) -> Unit,
     onDeleteClick: (ExpirationDocument) -> Unit
 ) {
-    // Ask for notification permission so expiry reminders can actually appear (API 33+).
     val context = androidx.compose.ui.platform.LocalContext.current
     val notifPermission = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
         onResult = { }
     )
     LaunchedEffect(Unit) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                context, android.Manifest.permission.POST_NOTIFICATIONS
-            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (androidx.core.content.ContextCompat.checkSelfPermission(
+            context, android.Manifest.permission.POST_NOTIFICATIONS
+        ) != android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
             notifPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }

@@ -134,11 +134,3 @@ fun MenuSelectionCard(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun BillsMenuScreenPreview() {
-    FastTrackJapanTheme {
-        BillsMenuScreen(onScreenshotClick = {}, onViewLibraryClick = {}, onBack = {})
-    }
-}

@@ -13,7 +13,7 @@ class GarbageRepository(private val context: Context) {
 
     private val cacheFile: File get() = File(context.filesDir, "garbage_cache.json")
 
-    // Hardcoded fallbacks only used if DB is empty/unreachable
+
     private val fallbackWards = listOf(GarbageWard("131041", "新宿区", "Shinjuku City"))
     private val fallbackArea = GarbageArea("shinjuku-1", "131041", "西新宿1丁目", "Nishi-Shinjuku 1-chome")
 
@@ -21,7 +21,7 @@ class GarbageRepository(private val context: Context) {
         val list = Supabase.client.postgrest["garbage_wards"]
             .select { order("nameEn", Order.ASCENDING) }
             .decodeList<GarbageWard>()
-        if (list.isEmpty()) fallbackWards else list
+        list.ifEmpty { fallbackWards }
     } catch (e: Exception) {
         Log.e("GarbageRepository", "Fetch wards failed: ${e.message}")
         fallbackWards
@@ -40,12 +40,10 @@ class GarbageRepository(private val context: Context) {
     }
 
     suspend fun fetchSnapshot(areaId: String): GarbageScheduleSnapshot = try {
-        // 1. Fetch Area
         val area = Supabase.client.postgrest["garbage_areas"]
             .select { filter { eq("id", areaId) } }
             .decodeSingle<GarbageArea>()
 
-        // 2. Fetch Categories
         val categories = try {
             Supabase.client.postgrest["garbage_categories"]
                 .select { order("sort", Order.ASCENDING) }
@@ -55,7 +53,6 @@ class GarbageRepository(private val context: Context) {
             defaultCategories()
         }
 
-        // 3. Fetch Schedules
         val schedules = Supabase.client.postgrest["garbage_schedules"]
             .select { filter { eq("areaId", areaId) } }
             .decodeList<GarbageSchedule>()
@@ -63,7 +60,6 @@ class GarbageRepository(private val context: Context) {
         GarbageScheduleSnapshot(area, categories, schedules)
     } catch (e: Exception) {
         Log.e("GarbageRepository", "fetchSnapshot failed: ${e.message}")
-        // If everything fails, return a minimal snapshot so the app doesn't crash
         GarbageScheduleSnapshot(fallbackArea, defaultCategories(), emptyList())
     }
 

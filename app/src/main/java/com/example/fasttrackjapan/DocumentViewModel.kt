@@ -1,14 +1,15 @@
 package com.example.fasttrackjapan
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 
-class DocumentViewModel : ViewModel() {
+class DocumentViewModel(application: Application) : AndroidViewModel(application) {
     private val _documents = mutableStateListOf<ExpirationDocument>()
     val documents: List<ExpirationDocument> get() = _documents
 
@@ -31,6 +32,8 @@ class DocumentViewModel : ViewModel() {
                     
                     _documents.clear()
                     _documents.addAll(docsFromDb)
+                    
+                    DocumentReminderScheduler.schedule(getApplication())
                 }
             } catch (e: Exception) {
                 Log.e("DocumentViewModel", "Error fetching documents: ${e.message}")
@@ -51,6 +54,8 @@ class DocumentViewModel : ViewModel() {
                 
                 Supabase.client.postgrest["documents"].insert(newDoc)
                 _documents.add(newDoc)
+                
+                DocumentReminderScheduler.schedule(getApplication())
             } catch (e: Exception) {
                 Log.e("DocumentViewModel", "Error adding document: ${e.message}")
             }
@@ -84,6 +89,9 @@ class DocumentViewModel : ViewModel() {
                 if (index != -1) {
                     _documents[index] = doc
                 }
+                
+                // Reschedule to update reminder timings
+                DocumentReminderScheduler.schedule(getApplication())
             } catch (e: Exception) {
                 Log.e("DocumentViewModel", "Error updating document: ${e.message}")
             }
@@ -92,5 +100,6 @@ class DocumentViewModel : ViewModel() {
     
     fun clearDocuments() {
         _documents.clear()
+        DocumentReminderScheduler.cancel(getApplication())
     }
 }

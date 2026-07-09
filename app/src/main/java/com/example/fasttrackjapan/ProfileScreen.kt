@@ -163,7 +163,7 @@ fun ProfileScreen(
                         ward = profile?.ward ?: "",
                         profilePictureUri = selectedImageUri,
                         context = context,
-                        onSuccess = { /* Handle success toast if needed */ }
+                        onSuccess = { onBack() }
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),

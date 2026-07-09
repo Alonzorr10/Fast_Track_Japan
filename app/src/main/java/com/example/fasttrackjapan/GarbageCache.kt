@@ -1,6 +1,5 @@
 package com.example.fasttrackjapan
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 object GarbageCache {
