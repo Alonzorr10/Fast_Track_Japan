@@ -59,6 +59,16 @@ For git, if you are on Windows,
 - **DocumentData** is simply the class file that denotes the attributes of a document. We use @Serializable to allow for "ExpirationDocument" to be used when refering to a document instance
 - **DocumentViewModel** is where all the functions pertaining to a document are housed and are called in the respective Document related files
 - ResourceCenterScreen.kt: This is the component that simply holds important resources for a user to access and download
+- GarbageCache, GarbageData.kt, GarbageReminderScheduler, GarbageReminderWorker, GarbageRepository, GarbageScheduleCalculator, GarbageScheduleScreen.kt, GarbageSetupScreen.kt, GarbageViewModel.kt: These are the files that handle the Garbage Scheduling Component
+- **GarbageCache** is the file that handles the translation of the Garbage Data from Supabase. The data is flattened into text and saved locally to allow for offline viewing
+- **GarabageData** is the file that contains the attributes for different objects relating to the GarbageScheduleComponent. Classes like "GarabageArea", "GarbageCategory", etc are defined here with their appropriate attributes
+- **GarabageReminderScheduler** is the file that handles the push notification logic. When configured by the user, it calculates when to actually push notifications. Note: Doesn't **push** the notification itself, that's GarbageReminderWorker
+- **GarbageReminderWorker** is the file that handles the notification push. This is where the notification alerting the user about a garbage day happens
+- **GarbageRepository** is the file that communicates with Supabase and displays the options for "Ward" and "Area" as well as the actual schedules saved for each in "Garbage_Schedule"
+- **GarbageScheduleCalculator** is the file that handles the computation and comparison of whether or not the time set by the user is met or not and to alert "GarbageReminderScheduler" about that information
+- **GarbageSchedulerScree** is the screen that displays after a user saves their Ward and Area. Once saved, the schedule for the designated location is loaded from Supabase and displayed on this screen
+- **GarbageSetupScreen** is the initial screen shown to users that allows them to select their Ward and Area as well as the time they'd like to be notified.
+- **GarbageViewModel** is the file that houses all functions related to the GarbageDayComponent that all files use from.
 - ProfileScreen.kt, ProfileViewModel, UserData.kt: These are the files that have to do with the user's profile information
 - **ProfileScreen** is the actual screen where a user can view and edit their information
 - **UserData** is the class file that denotes the attributes of a user. We use @Serializable to allow for "UserProfile" to be used when refering to a user instance
