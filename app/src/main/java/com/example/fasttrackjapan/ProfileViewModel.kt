@@ -35,7 +35,7 @@ class ProfileViewModel : ViewModel() {
             try {
                 val user = Supabase.client.auth.currentUserOrNull()
                 if (user != null) {
-                    Log.d("ProfileViewModel", "User logged in: ${user.id}. Querying database...")
+                    Log.d("ProfileViewModel", "Fetching profile")
                     val result = Supabase.client.postgrest["profiles"]
                         .select {
                             filter {
@@ -44,7 +44,7 @@ class ProfileViewModel : ViewModel() {
                         }
                         .decodeSingleOrNull<UserProfile>()
                     
-                    Log.d("ProfileViewModel", "Fetch result: $result")
+                    Log.d("ProfileViewModel", "Fetch complete (found=${result != null})")
                     profile = result
                 } else {
                     Log.e("ProfileViewModel", "Cannot fetch profile: No user logged in")
@@ -66,7 +66,7 @@ class ProfileViewModel : ViewModel() {
         context: Context,
         onSuccess: () -> Unit
     ) {
-        Log.d("ProfileViewModel", "Saving profile: name=$fullName, age=$age, ward=$ward")
+        Log.d("ProfileViewModel", "Saving profile")
         viewModelScope.launch {
             isLoading = true
             try {
@@ -85,7 +85,7 @@ class ProfileViewModel : ViewModel() {
                             upsert = true
                         }
                         imageUrl = Supabase.client.storage["profiles"].publicUrl(fileName)
-                        Log.d("ProfileViewModel", "Picture uploaded successfully: $imageUrl")
+                        Log.d("ProfileViewModel", "Picture uploaded")
                     }
                 }
 
@@ -100,7 +100,7 @@ class ProfileViewModel : ViewModel() {
                     updatedAt = java.time.Instant.now().toString()
                 )
 
-                Log.d("ProfileViewModel", "Upserting profile to DB: $newProfile")
+                Log.d("ProfileViewModel", "Upserting profile")
                 Supabase.client.postgrest["profiles"].upsert(newProfile)
                 Log.d("ProfileViewModel", "Profile saved successfully")
                 profile = newProfile

@@ -210,7 +210,7 @@ fun SignUpScreen(
                                 age = ageInt,
                                 updatedAt = java.time.Instant.now().toString()
                             )
-                            Log.d("SignUp", "Creating profile for user ${user.id}: $profile")
+                            Log.d("SignUp", "Creating profile after signup")
                             Supabase.client.postgrest["profiles"].upsert(profile)
                             onSignUpSuccess()
                         } else {
