@@ -69,6 +69,8 @@ open class ProcedureViewModel(app: Application) : AndroidViewModel(app) {
             } catch (e: Exception) {
                 Log.e("ProcedureViewModel", "load failed: ${e.message}")
                 _errorMessage.value = "Couldn't load your procedures. Check your connection."
+                _activeProcedure.value = null
+                _steps.value = emptyList()
             } finally {
                 _isLoading.value = false
                 _initialLoadDone.value = true

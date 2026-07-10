@@ -20,7 +20,8 @@ fun ProcedureListScreen(
     onBack: () -> Unit,
     onProcedureClick: (String) -> Unit
 ) {
-    LaunchedEffect(Unit) { viewModel.load() }
+    val initialLoadDone by viewModel.initialLoadDone.collectAsState()
+    LaunchedEffect(Unit) { if (!initialLoadDone) viewModel.load() }
     val procedures by viewModel.procedures.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.errorMessage.collectAsState()

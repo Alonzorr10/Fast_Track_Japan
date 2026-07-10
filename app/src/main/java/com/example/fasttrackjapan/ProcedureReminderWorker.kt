@@ -9,6 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import io.github.jan.supabase.auth.auth
 import java.time.LocalDate
 
 class ProcedureReminderWorker(
@@ -40,7 +41,11 @@ class ProcedureReminderWorker(
         } catch (e: Exception) {
             Log.e("ProcedureReminderWorker", "check failed: ${e.message}")
         } finally {
-            ProcedureReminderScheduler.schedule(context)
+            // Only reschedule while a user is still signed in.
+            // Sign-out cancels pending work, but a work run in flight would otherwise re-enqueue.
+            if (Supabase.client.auth.currentUserOrNull() != null) {
+                ProcedureReminderScheduler.schedule(context)
+            }
         }
         return Result.success()
     }

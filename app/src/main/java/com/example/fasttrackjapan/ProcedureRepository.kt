@@ -40,8 +40,9 @@ class ProcedureRepository {
             startDate = startDate,
             createdAt = java.time.Instant.now().toString()
         )
-        Supabase.client.postgrest["user_procedures"].upsert(row)
-        return row
+        Supabase.client.postgrest["user_procedures"].upsert(row) { onConflict = "userId,procedureCode" }
+        // Re-read so callers get the DB-authoritative id (in case the row already existed).
+        return getUserProcedure(procedureCode)
     }
 
     suspend fun fetchUserSteps(userProcedureId: String): List<UserProcedureStep> =

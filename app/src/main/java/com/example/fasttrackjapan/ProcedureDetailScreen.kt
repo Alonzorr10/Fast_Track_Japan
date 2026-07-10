@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 
@@ -110,6 +109,4 @@ private fun StatusPill(view: ProcedureStepView) {
     Surface(color = color.copy(alpha = 0.15f), contentColor = color, shape = MaterialTheme.shapes.small) {
         Text(label, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
     }
-    // Suppress unused-variable warning on `Color` import above; keeps signatures stable if theme changes.
-    @Suppress("UNUSED_EXPRESSION") Color.Transparent
 }
