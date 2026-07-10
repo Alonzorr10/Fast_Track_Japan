@@ -5,38 +5,35 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 
-class DocumentViewModel(application: Application) : AndroidViewModel(application) {
+open class DocumentViewModel(application: Application) : AndroidViewModel(application) {
+
+    /** Minimal repo surface for testability. `DocumentRepository` implements it in production. */
+    interface Repo {
+        suspend fun fetchDocuments(): List<ExpirationDocument>
+        suspend fun addDocument(type: String, expirationDate: String, notificationLeadTime: Int): ExpirationDocument?
+        suspend fun deleteDocument(id: String)
+        suspend fun updateDocument(doc: ExpirationDocument)
+    }
+
+    private val repo: Repo = DefaultRepo(DocumentRepository())
+    private var testRepo: Repo? = null
+    protected fun setRepoForTest(r: Repo) { testRepo = r }
+    private val effectiveRepo: Repo get() = testRepo ?: repo
+
     private val _documents = mutableStateListOf<ExpirationDocument>()
     val documents: List<ExpirationDocument> get() = _documents
-
-    init {
-        fetchDocuments()
-    }
 
     fun fetchDocuments() {
         viewModelScope.launch {
             try {
-                val user = Supabase.client.auth.currentUserOrNull()
-                if (user != null) {
-                    val docsFromDb = Supabase.client.postgrest["documents"]
-                        .select {
-                            filter {
-                                eq("userId", user.id)
-                            }
-                        }
-                        .decodeList<ExpirationDocument>()
-                    
-                    _documents.clear()
-                    _documents.addAll(docsFromDb)
-                    
-                    DocumentReminderScheduler.schedule(getApplication())
-                }
+                val docs = effectiveRepo.fetchDocuments()
+                _documents.clear()
+                _documents.addAll(docs)
+                DocumentReminderScheduler.schedule(getApplication())
             } catch (e: Exception) {
-                Log.e("DocumentViewModel", "Error fetching documents: ${e.message}")
+                Log.e("DocumentViewModel", "fetch failed: ${e.message}")
             }
         }
     }
@@ -44,20 +41,11 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
     fun addDocument(type: String, expirationDate: String, notificationLeadTime: Int) {
         viewModelScope.launch {
             try {
-                val user = Supabase.client.auth.currentUserOrNull() ?: return@launch
-                val newDoc = ExpirationDocument(
-                    type = type,
-                    expirationDate = expirationDate,
-                    notificationLeadTime = notificationLeadTime,
-                    userId = user.id
-                )
-                
-                Supabase.client.postgrest["documents"].insert(newDoc)
+                val newDoc = effectiveRepo.addDocument(type, expirationDate, notificationLeadTime) ?: return@launch
                 _documents.add(newDoc)
-                
                 DocumentReminderScheduler.schedule(getApplication())
             } catch (e: Exception) {
-                Log.e("DocumentViewModel", "Error adding document: ${e.message}")
+                Log.e("DocumentViewModel", "add failed: ${e.message}")
             }
         }
     }
@@ -65,14 +53,10 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
     fun deleteDocument(doc: ExpirationDocument) {
         viewModelScope.launch {
             try {
-                Supabase.client.postgrest["documents"].delete {
-                    filter {
-                        eq("id", doc.id)
-                    }
-                }
+                effectiveRepo.deleteDocument(doc.id)
                 _documents.removeIf { it.id == doc.id }
             } catch (e: Exception) {
-                Log.e("DocumentViewModel", "Error deleting document: ${e.message}")
+                Log.e("DocumentViewModel", "delete failed: ${e.message}")
             }
         }
     }
@@ -80,26 +64,36 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
     fun updateDocument(doc: ExpirationDocument) {
         viewModelScope.launch {
             try {
-                Supabase.client.postgrest["documents"].update(doc) {
-                    filter {
-                        eq("id", doc.id)
-                    }
-                }
+                effectiveRepo.updateDocument(doc)
                 val index = _documents.indexOfFirst { it.id == doc.id }
-                if (index != -1) {
-                    _documents[index] = doc
-                }
-                
-                // Reschedule to update reminder timings
+                if (index != -1) _documents[index] = doc
                 DocumentReminderScheduler.schedule(getApplication())
             } catch (e: Exception) {
-                Log.e("DocumentViewModel", "Error updating document: ${e.message}")
+                Log.e("DocumentViewModel", "update failed: ${e.message}")
             }
         }
     }
-    
+
     fun clearDocuments() {
         _documents.clear()
         DocumentReminderScheduler.cancel(getApplication())
+    }
+
+    /** Adapts the real repository to the ViewModel's Repo surface. */
+    private class DefaultRepo(private val real: DocumentRepository) : Repo {
+        override suspend fun fetchDocuments() = real.fetchDocuments()
+        override suspend fun addDocument(type: String, expirationDate: String, notificationLeadTime: Int) =
+            real.addDocument(type, expirationDate, notificationLeadTime)
+        override suspend fun deleteDocument(id: String) = real.deleteDocument(id)
+        override suspend fun updateDocument(doc: ExpirationDocument) = real.updateDocument(doc)
+    }
+
+    companion object {
+        /** Testing seam: build a VM against a fake Repo. */
+        fun newForTest(fake: Repo): DocumentViewModel {
+            return object : DocumentViewModel(Application()) {
+                init { this.setRepoForTest(fake) }
+            }
+        }
     }
 }
