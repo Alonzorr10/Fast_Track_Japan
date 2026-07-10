@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
@@ -44,6 +45,7 @@ fun MainMenuScreen(
     onExpirationTrackerClick: () -> Unit,
     onResourceCenterClick: () -> Unit,
     onGarbageScheduleClick: () -> Unit,
+    onProceduresClick: () -> Unit,
     onProfileClick: () -> Unit,
     onSignOutClick: () -> Unit
 ) {
@@ -109,6 +111,15 @@ fun MainMenuScreen(
                     subtitle = "Collection days & reminders for your ward",
                     icon = Icons.Default.Delete,
                     onClick = onGarbageScheduleClick
+                )
+            }
+
+            item {
+                MainMenuCard(
+                    title = "Guided Procedures",
+                    subtitle = "Step-by-step checklists with deadlines",
+                    icon = Icons.Default.Checklist,
+                    onClick = onProceduresClick
                 )
             }
 

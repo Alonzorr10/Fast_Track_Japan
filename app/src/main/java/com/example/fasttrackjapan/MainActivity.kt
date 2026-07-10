@@ -48,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 val docViewModel: DocumentViewModel = viewModel()
                 val profileViewModel: ProfileViewModel = viewModel()
                 val garbageViewModel: GarbageViewModel = viewModel()
+                val procedureViewModel: ProcedureViewModel = viewModel()
                 val appContext = androidx.compose.ui.platform.LocalContext.current
 
                 NavHost(navController = navController, startDestination = "splash") {
@@ -60,7 +61,9 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                procedureViewModel.load()
                                 DocumentReminderScheduler.schedule(appContext)
+                                ProcedureReminderScheduler.schedule(appContext)
                                 navController.navigate("main_menu") {
                                     popUpTo("splash") { inclusive = true }
                                 }
@@ -89,7 +92,9 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                procedureViewModel.load()
                                 DocumentReminderScheduler.schedule(appContext)
+                                ProcedureReminderScheduler.schedule(appContext)
                                 navController.navigate("main_menu") {
                                     popUpTo("welcome") { inclusive = true }
                                 }
@@ -104,7 +109,9 @@ class MainActivity : ComponentActivity() {
                                 docViewModel.fetchDocuments()
                                 profileViewModel.fetchProfile()
                                 garbageViewModel.load()
+                                procedureViewModel.load()
                                 DocumentReminderScheduler.schedule(appContext)
+                                ProcedureReminderScheduler.schedule(appContext)
                                 // Capture garbage-collection location as a one-time step right after registration.
                                 navController.navigate("location_onboarding") {
                                     popUpTo("welcome") { inclusive = true }
@@ -136,6 +143,7 @@ class MainActivity : ComponentActivity() {
                             onExpirationTrackerClick = { navController.navigate("expiration_list") },
                             onResourceCenterClick = { navController.navigate("resource_center") },
                             onGarbageScheduleClick = { navController.navigate("garbage") },
+                            onProceduresClick = { navController.navigate("procedures") },
                             onProfileClick = { navController.navigate("profile") },
                             onSignOutClick = {
                                 scope.launch {
@@ -144,7 +152,9 @@ class MainActivity : ComponentActivity() {
                                         viewModel.clearBills()
                                         docViewModel.clearDocuments()
                                         garbageViewModel.clear()
+                                        procedureViewModel.clear()
                                         DocumentReminderScheduler.cancel(appContext)
+                                        ProcedureReminderScheduler.cancel(appContext)
                                         navController.navigate("welcome") {
                                             popUpTo("main_menu") { inclusive = true }
                                         }
@@ -266,6 +276,39 @@ class MainActivity : ComponentActivity() {
                         GarbageSetupScreen(
                             viewModel = garbageViewModel,
                             onSaved = { navController.popBackStack() },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("procedures") {
+                        ProcedureListScreen(
+                            viewModel = procedureViewModel,
+                            onBack = { navController.popBackStack() },
+                            onProcedureClick = { code ->
+                                val active = procedureViewModel.activeProcedure.value
+                                if (active == null || active.procedureCode != code) {
+                                    navController.navigate("procedure_start/$code")
+                                } else {
+                                    navController.navigate("procedure/$code")
+                                }
+                            }
+                        )
+                    }
+                    composable("procedure_start/{code}") { backStackEntry ->
+                        val code = backStackEntry.arguments?.getString("code") ?: return@composable
+                        ProcedureStartScreen(
+                            procedureCode = code,
+                            viewModel = procedureViewModel,
+                            onStarted = {
+                                navController.navigate("procedure/$code") {
+                                    popUpTo("procedures")
+                                }
+                            },
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable("procedure/{code}") { _ ->
+                        ProcedureDetailScreen(
+                            viewModel = procedureViewModel,
                             onBack = { navController.popBackStack() }
                         )
                     }
