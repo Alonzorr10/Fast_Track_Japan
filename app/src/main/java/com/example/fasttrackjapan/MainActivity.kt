@@ -345,14 +345,14 @@ fun WelcomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Fast Track Japan",
+            text = androidx.compose.ui.res.stringResource(R.string.app_name),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
         )
         Text(
-            text = "Convenience at your 指先",
+            text = androidx.compose.ui.res.stringResource(R.string.welcome_subtitle),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -366,7 +366,7 @@ fun WelcomeScreen(
             onClick = onLogin,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Log In", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
+            Text(text = androidx.compose.ui.res.stringResource(R.string.action_log_in), fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -375,7 +375,7 @@ fun WelcomeScreen(
             onClick = onSignUp,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Sign Up", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
+            Text(text = androidx.compose.ui.res.stringResource(R.string.action_sign_up), fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
         }
     }
 }

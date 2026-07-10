@@ -1,3 +1,144 @@
 <resources>
     <string name="app_name">Fast Track Japan</string>
+
+    <!-- Welcome screen -->
+    <string name="welcome_subtitle">Convenience at your 指先</string>
+    <string name="action_log_in">Log In</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="action_login">Login</string>
+
+    <!-- Common actions -->
+    <string name="action_back">Back</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_view">View</string>
+
+    <!-- Auth: login / signup -->
+    <string name="field_email">Email</string>
+    <string name="field_password">Password</string>
+    <string name="field_full_name">Full Name</string>
+    <string name="field_age">Age</string>
+    <string name="action_create_account">Create Account</string>
+    <string name="auth_email_or_password_incorrect">The email or password you entered is incorrect.</string>
+    <string name="auth_connection_error">Connection error. Please check your internet and try again.</string>
+    <string name="auth_login_failed">Login failed. Please try again.</string>
+    <string name="auth_signup_check_email">Account created. Please check your email to confirm your address, then log in.</string>
+    <string name="auth_signup_email_in_use">This email is already in use.</string>
+    <string name="auth_signup_invalid_email">Please enter a valid email address.</string>
+    <string name="auth_signup_failed_generic">Sign up failed. Please check your connection and try again.</string>
+    <string name="auth_signup_fill_all_fields">Please fill in all fields.</string>
+    <string name="auth_signup_password_too_short">Password must be at least 6 characters long.</string>
+    <string name="auth_signup_age_minimum">You must be at least 20 years old to register.</string>
+
+    <!-- Main menu -->
+    <string name="menu_bill_tracker">Bill Tracker</string>
+    <string name="menu_bill_tracker_subtitle">Manage paper bills with camera</string>
+    <string name="menu_expiration_tracker">Expiration Tracker</string>
+    <string name="menu_expiration_tracker_subtitle">Track document expiration dates</string>
+    <string name="menu_resource_center">Resource Center</string>
+    <string name="menu_resource_center_subtitle">Official forms and procedure guides</string>
+    <string name="menu_garbage_schedule">Garbage Schedule</string>
+    <string name="menu_garbage_schedule_subtitle">Collection days &amp; reminders for your ward</string>
+    <string name="menu_guided_procedures">Guided Procedures</string>
+    <string name="menu_guided_procedures_subtitle">Step-by-step checklists with deadlines</string>
+    <string name="action_sign_out">Sign Out</string>
+
+    <!-- Profile screen -->
+    <string name="profile_title">My Profile</string>
+    <string name="profile_assigned_ward">Assigned Ward</string>
+    <string name="profile_save_changes">Save Changes</string>
+    <string name="profile_updated_toast">Profile updated!</string>
+    <string name="profile_permission_denied">Permission denied. Please check your account settings.</string>
+    <string name="profile_save_failed_generic">Could not save profile. Please try again.</string>
+
+    <!-- Bills -->
+    <string name="bills_menu_title">Bill Tracker</string>
+    <string name="bills_library_title">Bill Library</string>
+    <string name="bills_screenshot_bill">Screenshot a Bill</string>
+    <string name="bills_view_library">View Library</string>
+    <string name="bills_empty">No bills captured yet.</string>
+    <string name="bills_sort_by_label">Sort by Label</string>
+    <string name="bills_sort_by_date">Sort by Date</string>
+    <string name="bills_edit_bill">Edit Bill</string>
+    <string name="bills_label_your_bill">Label your Bill</string>
+    <string name="bills_label_field">Label (e.g. Wifi Bill)</string>
+    <string name="bills_date_field">Date</string>
+    <string name="bills_save_bill">Save Bill</string>
+    <string name="bills_go_back">Go Back</string>
+    <string name="bills_photo_is_this_good">Is this photo good?</string>
+    <string name="bills_photo_retake">Retake</string>
+    <string name="bills_photo_yes_good">Yes, it\'s good</string>
+    <string name="bills_bill_image_desc">Bill Image</string>
+    <string name="bills_captured_bill_desc">Captured Bill</string>
+    <string name="camera_permission_required">Camera permission required</string>
+    <string name="camera_capture_desc">Capture</string>
+    <string name="bills_saved_toast">Bill saved successfully!</string>
+    <string name="bills_error_not_logged_in">Error: You must be logged in</string>
+    <string name="bills_error_read_image_failed">Error: Failed to read image</string>
+    <string name="bills_error_unexpected">An unexpected error occurred</string>
+
+    <!-- Documents / Expiration Tracker -->
+    <string name="expiration_tracker_title">Expiration Tracker</string>
+    <string name="expiration_add_document">Add Document</string>
+    <string name="expiration_empty">No documents tracked yet.</string>
+    <string name="expiration_expires_prefix">Expires: </string>
+    <string name="expiration_alert_days_before">Alert: %1$d days before</string>
+    <string name="expiration_expired_label">EXPIRED</string>
+    <string name="expiration_add_title">Add Document</string>
+    <string name="expiration_edit_title">Edit Document</string>
+    <string name="expiration_select_type">Select Document Type</string>
+    <string name="expiration_date_field">Expiration Date</string>
+    <string name="expiration_lead_field">Notify me (days before)</string>
+    <string name="expiration_save_document">Save Document</string>
+    <string name="expiration_update_document">Update Document</string>
+
+    <!-- Resource center -->
+    <string name="resource_center_title">Resource Center</string>
+    <string name="resource_center_lead">Quick access to official forms and guides for common procedures in Japan.</string>
+    <string name="resource_center_open_link">Open Link</string>
+
+    <!-- Garbage schedule -->
+    <string name="garbage_setup_title">Set up garbage schedule</string>
+    <string name="garbage_setup_select_ward">Select your ward and district</string>
+    <string name="garbage_field_ward">Ward</string>
+    <string name="garbage_field_district">District</string>
+    <string name="garbage_field_enable_reminders">Enable reminders</string>
+    <string name="garbage_field_remind_time">Remind me the evening before, at</string>
+    <string name="garbage_notif_disabled_hint">Notifications are turned off for this app. Reminders won\'t appear until you enable them in system settings.</string>
+    <string name="garbage_schedule_title">Garbage Schedule</string>
+    <string name="garbage_no_collections">No collections found for your area yet.</string>
+    <string name="garbage_no_schedule_loaded">No schedule loaded.</string>
+    <string name="garbage_change_area">Change area</string>
+    <string name="garbage_upcoming">Upcoming</string>
+
+    <!-- Guided procedures -->
+    <string name="procedures_title">Guided Procedures</string>
+    <string name="procedures_empty">No guided procedures available yet.</string>
+    <string name="procedures_start_title">Start procedure</string>
+    <string name="procedures_start_prompt">When did you move in? Past dates are OK — we\'ll flag anything overdue.</string>
+    <string name="procedures_move_in_date">Move-in date</string>
+    <string name="procedures_start_action">Start</string>
+    <string name="procedures_open_form">Open form</string>
+    <string name="procedures_moving_in_title">Moving In</string>
+    <string name="procedures_status_done">Done</string>
+    <string name="procedures_status_no_deadline">No deadline</string>
+    <string name="procedures_status_due_today">Due today</string>
+    <string name="procedures_status_in_days">In %1$d days</string>
+    <string name="procedures_status_overdue">%1$d days overdue</string>
+    <string name="procedures_status_overdue_one">1 day overdue</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_garbage">Garbage reminders</string>
+    <string name="notif_channel_garbage_desc">Reminds you the evening before a collection day</string>
+    <string name="notif_channel_documents">Document expiry reminders</string>
+    <string name="notif_channel_documents_desc">Reminds you before a tracked document expires</string>
+    <string name="notif_channel_procedures">Procedure step reminders</string>
+    <string name="notif_channel_procedures_desc">Reminds you before a step in a guided procedure is due</string>
+
+    <!-- Shared error strings -->
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="error_connection">Please check your connection and try again.</string>
 </resources>
