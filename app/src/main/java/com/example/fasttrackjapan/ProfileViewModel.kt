@@ -22,6 +22,12 @@ class ProfileViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
 
+    /** Reset in-memory state on sign-out so the previous user's profile does not leak into the next session. */
+    fun clear() {
+        profile = null
+        isLoading = false
+    }
+
     fun fetchProfile() {
         Log.d("ProfileViewModel", "Fetching profile...")
         viewModelScope.launch {

@@ -89,7 +89,7 @@ class GarbageRepository(private val context: Context) {
         }
     }
 
-    fun writeCache(snapshot: GarbageScheduleSnapshot) {
+    suspend fun writeCache(snapshot: GarbageScheduleSnapshot) = withContext(Dispatchers.IO) {
         try {
             cacheFile.writeText(GarbageCache.encode(snapshot))
         } catch (e: Exception) {
@@ -97,10 +97,12 @@ class GarbageRepository(private val context: Context) {
         }
     }
 
-    fun readCache(): GarbageScheduleSnapshot? = try {
-        if (cacheFile.exists()) GarbageCache.decode(cacheFile.readText()) else null
-    } catch (e: Exception) {
-        null
+    suspend fun readCache(): GarbageScheduleSnapshot? = withContext(Dispatchers.IO) {
+        try {
+            if (cacheFile.exists()) GarbageCache.decode(cacheFile.readText()) else null
+        } catch (e: Exception) {
+            null
+        }
     }
 
     suspend fun clearCache() = withContext(Dispatchers.IO) {

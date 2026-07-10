@@ -151,6 +151,7 @@ class MainActivity : ComponentActivity() {
                                         Supabase.client.auth.signOut()
                                         viewModel.clearBills()
                                         docViewModel.clearDocuments()
+                                        profileViewModel.clear()
                                         garbageViewModel.clear()
                                         procedureViewModel.clear()
                                         DocumentReminderScheduler.cancel(appContext)
