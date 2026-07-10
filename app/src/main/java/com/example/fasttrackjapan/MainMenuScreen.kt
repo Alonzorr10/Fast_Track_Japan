@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,7 @@ fun MainMenuScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Fast Track Japan") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = onProfileClick) {
                         Icon(
@@ -80,8 +81,8 @@ fun MainMenuScreen(
         ) {
             item {
                 MainMenuCard(
-                    title = "Bill Tracker",
-                    subtitle = "Manage paper bills with camera",
+                    title = stringResource(R.string.menu_bill_tracker),
+                    subtitle = stringResource(R.string.menu_bill_tracker_subtitle),
                     icon = Icons.Default.Description,
                     onClick = onBillTrackerClick
                 )
@@ -89,8 +90,8 @@ fun MainMenuScreen(
 
             item {
                 MainMenuCard(
-                    title = "Expiration Tracker",
-                    subtitle = "Track document expiration dates",
+                    title = stringResource(R.string.menu_expiration_tracker),
+                    subtitle = stringResource(R.string.menu_expiration_tracker_subtitle),
                     icon = Icons.Default.Badge,
                     onClick = onExpirationTrackerClick
                 )
@@ -98,17 +99,17 @@ fun MainMenuScreen(
 
             item {
                 MainMenuCard(
-                    title = "Resource Center",
-                    subtitle = "Official forms and procedure guides",
+                    title = stringResource(R.string.menu_resource_center),
+                    subtitle = stringResource(R.string.menu_resource_center_subtitle),
                     icon = Icons.Default.Info,
                     onClick = onResourceCenterClick
                 )
             }
-            
+
             item {
                 MainMenuCard(
-                    title = "Garbage Schedule",
-                    subtitle = "Collection days & reminders for your ward",
+                    title = stringResource(R.string.menu_garbage_schedule),
+                    subtitle = stringResource(R.string.menu_garbage_schedule_subtitle),
                     icon = Icons.Default.Delete,
                     onClick = onGarbageScheduleClick
                 )
@@ -116,8 +117,8 @@ fun MainMenuScreen(
 
             item {
                 MainMenuCard(
-                    title = "Guided Procedures",
-                    subtitle = "Step-by-step checklists with deadlines",
+                    title = stringResource(R.string.menu_guided_procedures),
+                    subtitle = stringResource(R.string.menu_guided_procedures_subtitle),
                     icon = Icons.Default.Checklist,
                     onClick = onProceduresClick
                 )

@@ -1,0 +1,107 @@
+<resources>
+    <string name="app_name">Fast Track Japan</string>
+
+    <!-- Welcome screen -->
+    <string name="action_log_in">ログイン</string>
+    <string name="action_sign_up">新規登録</string>
+    <string name="action_login">ログイン</string>
+
+    <!-- Common actions -->
+    <string name="action_back">戻る</string>
+    <string name="action_save">保存</string>
+    <string name="action_cancel">キャンセル</string>
+    <string name="action_ok">OK</string>
+    <string name="action_delete">削除</string>
+    <string name="action_edit">編集</string>
+    <string name="action_view">表示</string>
+
+    <!-- Auth: login / signup -->
+    <string name="field_email">メールアドレス</string>
+    <string name="field_password">パスワード</string>
+    <string name="field_full_name">氏名</string>
+    <string name="field_age">年齢</string>
+    <string name="action_create_account">アカウントを作成</string>
+
+    <!-- Main menu -->
+    <string name="menu_bill_tracker">請求書トラッカー</string>
+    <string name="menu_bill_tracker_subtitle">カメラで紙の請求書を管理</string>
+    <string name="menu_expiration_tracker">有効期限トラッカー</string>
+    <string name="menu_expiration_tracker_subtitle">書類の有効期限を管理</string>
+    <string name="menu_resource_center">リソースセンター</string>
+    <string name="menu_resource_center_subtitle">公式の書類と手続きガイド</string>
+    <string name="menu_garbage_schedule">ゴミ収集スケジュール</string>
+    <string name="menu_garbage_schedule_subtitle">お住まいの区の収集日とリマインダー</string>
+    <string name="menu_guided_procedures">手続きガイド</string>
+    <string name="menu_guided_procedures_subtitle">期限付きのステップバイステップのチェックリスト</string>
+    <string name="action_sign_out">ログアウト</string>
+
+    <!-- Profile screen -->
+    <string name="profile_title">プロフィール</string>
+    <string name="profile_assigned_ward">お住まいの区</string>
+    <string name="profile_save_changes">変更を保存</string>
+    <string name="profile_updated_toast">プロフィールを更新しました</string>
+
+    <!-- Bills -->
+    <string name="bills_menu_title">請求書トラッカー</string>
+    <string name="bills_library_title">請求書ライブラリ</string>
+    <string name="bills_screenshot_bill">請求書を撮影</string>
+    <string name="bills_view_library">ライブラリを表示</string>
+    <string name="bills_empty">まだ請求書がありません。</string>
+    <string name="bills_sort_by_label">ラベルで並べ替え</string>
+    <string name="bills_sort_by_date">日付で並べ替え</string>
+    <string name="bills_edit_bill">請求書を編集</string>
+    <string name="bills_label_your_bill">請求書にラベルを付ける</string>
+    <string name="bills_label_field">ラベル(例:Wifi 料金)</string>
+    <string name="bills_date_field">日付</string>
+    <string name="bills_save_bill">請求書を保存</string>
+    <string name="bills_go_back">戻る</string>
+    <string name="bills_photo_is_this_good">この写真でよろしいですか?</string>
+    <string name="bills_photo_retake">撮り直す</string>
+    <string name="bills_photo_yes_good">はい</string>
+    <string name="camera_permission_required">カメラの許可が必要です</string>
+
+    <!-- Documents / Expiration Tracker -->
+    <string name="expiration_tracker_title">有効期限トラッカー</string>
+    <string name="expiration_add_document">書類を追加</string>
+    <string name="expiration_empty">まだ登録された書類がありません。</string>
+    <string name="expiration_expires_prefix">有効期限: </string>
+    <string name="expiration_alert_days_before">通知:期限の%1$d日前</string>
+    <string name="expiration_expired_label">期限切れ</string>
+    <string name="expiration_add_title">書類を追加</string>
+    <string name="expiration_edit_title">書類を編集</string>
+    <string name="expiration_select_type">書類の種類を選択</string>
+    <string name="expiration_date_field">有効期限</string>
+    <string name="expiration_lead_field">通知(期限の何日前)</string>
+    <string name="expiration_save_document">保存</string>
+    <string name="expiration_update_document">更新</string>
+
+    <!-- Resource center -->
+    <string name="resource_center_title">リソースセンター</string>
+
+    <!-- Garbage schedule -->
+    <string name="garbage_setup_title">ゴミ収集の設定</string>
+    <string name="garbage_setup_select_ward">お住まいの区と丁目を選択してください</string>
+    <string name="garbage_field_ward">区</string>
+    <string name="garbage_field_district">丁目</string>
+    <string name="garbage_field_enable_reminders">リマインダーを有効にする</string>
+    <string name="garbage_schedule_title">ゴミ収集スケジュール</string>
+    <string name="garbage_no_collections">まだこの地域のスケジュールがありません。</string>
+    <string name="garbage_no_schedule_loaded">スケジュールが読み込まれていません。</string>
+    <string name="garbage_change_area">地域を変更</string>
+    <string name="garbage_upcoming">今後の予定</string>
+
+    <!-- Guided procedures -->
+    <string name="procedures_title">手続きガイド</string>
+    <string name="procedures_empty">まだ利用可能な手続きガイドがありません。</string>
+    <string name="procedures_start_title">手続きを開始</string>
+    <string name="procedures_move_in_date">引越し日</string>
+    <string name="procedures_start_action">開始</string>
+    <string name="procedures_open_form">申請書を開く</string>
+    <string name="procedures_moving_in_title">引越し</string>
+    <string name="procedures_status_done">完了</string>
+    <string name="procedures_status_no_deadline">期限なし</string>
+    <string name="procedures_status_due_today">本日期限</string>
+    <string name="procedures_status_in_days">あと%1$d日</string>
+    <string name="procedures_status_overdue">%1$d日過ぎています</string>
+    <string name="procedures_status_overdue_one">1日過ぎています</string>
+</resources>
