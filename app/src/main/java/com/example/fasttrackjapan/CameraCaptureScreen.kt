@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -162,6 +163,17 @@ fun CameraPreviewScreen(
                 Log.e("CameraCapture", "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    // Shut down the single-thread executor and release CameraX when the screen leaves the composition;
+    // otherwise every visit to the camera leaks a background thread.
+    DisposableEffect(Unit) {
+        onDispose {
+            try { cameraExecutor.shutdown() } catch (_: Exception) {}
+            try {
+                ProcessCameraProvider.getInstance(context).get().unbindAll()
+            } catch (_: Exception) {}
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

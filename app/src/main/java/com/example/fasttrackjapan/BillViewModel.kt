@@ -51,7 +51,7 @@ class BillViewModel : ViewModel() {
     }
 
     fun addBill(context: Context, label: String, date: String, imageUri: Uri) {
-        Log.d("BillViewModel", "Starting addBill: label=$label, date=$date, uri=$imageUri")
+        Log.d("BillViewModel", "Starting addBill")
         viewModelScope.launch {
             try {
                 val user = Supabase.client.auth.currentUserOrNull()
@@ -62,8 +62,6 @@ class BillViewModel : ViewModel() {
                     }
                     return@launch
                 }
-                Log.d("BillViewModel", "Logged in user ID: ${user.id}")
-
                 val fileName = "${user.id}/${System.currentTimeMillis()}.jpg"
                 val bucket = Supabase.client.storage["Bills"]
 
@@ -85,7 +83,7 @@ class BillViewModel : ViewModel() {
                     }
                     return@launch
                 }
-                Log.d("BillViewModel", "Bytes read: ${bytes.size}. Starting upload to storage as $fileName...")
+                Log.d("BillViewModel", "Bytes read: ${bytes.size}. Uploading...")
 
                 try {
                     bucket.upload(fileName, bytes) {
@@ -105,7 +103,6 @@ class BillViewModel : ViewModel() {
 
                 // 2. Get Public URL
                 val imageUrl = bucket.publicUrl(fileName)
-                Log.d("BillViewModel", "Public URL obtained: $imageUrl")
 
                 // 3. Save to Database
                 val newBill = Bill(
@@ -114,7 +111,7 @@ class BillViewModel : ViewModel() {
                     imageUrl = imageUrl,
                     userId = user.id
                 )
-                Log.d("BillViewModel", "Inserting bill into database: $newBill")
+                Log.d("BillViewModel", "Inserting bill into database")
 
                 try {
                     Supabase.client.postgrest["bills"].insert(newBill)
