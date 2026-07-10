@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -33,6 +34,8 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
 
     val hasArea: Boolean get() = settings?.areaId != null
 
+    private var loadJob: Job? = null
+
     val upcoming: List<UpcomingCollection>
         get() = snapshot?.let {
             GarbageScheduleCalculator.upcoming(LocalDate.now(), 14, it.schedules)
@@ -42,11 +45,13 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
         snapshot?.categories?.firstOrNull { it.code == code }?.let { "${it.nameJa} (${it.nameEn})" } ?: code
 
     fun load() {
-        snapshot = repo.readCache()
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             isLoading = true
             errorMessage = null
             try {
+                // Show cache first for offline/instant render (now suspending on Dispatchers.IO).
+                snapshot = repo.readCache()
                 val s = repo.getUserSettings()
                 settings = s
                 if (s != null) {
@@ -141,6 +146,8 @@ class GarbageViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun clear() {
+        // Cancel any in-flight load so a late-arriving response can't repopulate state after sign-out.
+        loadJob?.cancel()
         settings = null
         snapshot = null
         wards.clear()
